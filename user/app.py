@@ -31,6 +31,7 @@ ENDPOINT = os.environ.get("ENDPOINT") or ""
 KEY = os.environ.get("KEY") or ""
 DATABASE_NAME = os.environ.get("DATABASE_NAME") or ""
 CONTAINER_NAME = os.environ.get("CONTAINER_NAME") or ""
+PARTITION_KEY = os.environ.get("PARTITION_KEY") or ""
 
 client = CosmosClient(ENDPOINT, credential=KEY)
 database = client.get_database_client(DATABASE_NAME)
@@ -49,25 +50,27 @@ def establish_connection() -> None:
 @app.route("/get", methods=["GET"])
 async def get_user():
     """Gets the user information stored in the database specified by the user id
-    Usage: 0.0.0.0/get?userid=<userid>"""
-    userid = request.values.get("userid") or ""
-    user_object = await container.read_item(item=userid,partition_key=True) #TODO: Determine partition key
+    Usage: 0.0.0.0/get?username=<username>"""
+    username = request.values.get("username")
+    if username is None:
+        return "ERROR: Request malformed", 400
+    user_object = await container.read_item(item=username,partition_key=PARTITION_KEY)
     return json.dumps(user_object)
 
 
 @app.route("/update", methods=["POST"])
 async def update_user():
-    """Updates the user information stored in the database specified by the user id
+    """Updates the user information stored in the database specified by the username
     and sends back 'OK' if user is found
-    Usage: 0.0.0.0/update?userid=<userid>, body contains fields to update"""
-    userid = request.values.get("userid")
-    if userid is None:
+    Usage: 0.0.0.0/update?username=<username>, body contains fields to update"""
+    username = request.values.get("username")
+    if username is None:
         return "ERROR: Request malformed", 400
     try :
-        user_object = await container.read_item(item=userid,partition_key=True) #TODO: Determine partition key
+        user_object = await container.read_item(item=username,partition_key=PARTITION_KEY)
         for key in request.values.keys():
             user_object[key] = request.values[key]
-        container.replace_item(item=userid,body=user_object)
+        container.replace_item(item=username,body=user_object)
         return "Okay", 200
     except CosmosHttpResponseError:
         return "ERROR: User not found", 400
@@ -77,6 +80,8 @@ async def update_user():
 def add_new_user():
     """Adds new user information to the database and sends back userid of new user
     Usage: 0.0.0.0/add, body contains fields to update"""
-    id = 0 #TODO: Create unique id
-    container.create_item(request.values)
-    return f'{id}'
+    try:
+        container.create_item(request.values)
+        return "Okay"
+    except CosmosHttpResponseError:
+        return "ERROR: Request malformed", 400
