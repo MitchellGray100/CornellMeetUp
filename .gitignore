@@ -1,5 +1,4 @@
 # VSCode files
-.vscode/
 .devcontainer/
 
 # Azure files
@@ -158,3 +157,5 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+.python_packages
