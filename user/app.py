@@ -55,7 +55,7 @@ async def get_user():
     if username is None:
         return "ERROR: Request malformed", 400
     user_object = await container.read_item(item=username,partition_key=PARTITION_KEY)
-    return json.dumps(user_object)
+    return json.dumps(user_object), 200
 
 
 @app.route("/update", methods=["POST"])
@@ -82,6 +82,19 @@ def add_new_user():
     Usage: 0.0.0.0/add, body contains fields to update"""
     try:
         container.create_item(request.values)
-        return "Okay"
+        return "Okay", 200
     except CosmosHttpResponseError:
         return "ERROR: Request malformed", 400
+
+@app.route("/delete", methods=["POST"])
+async def delete_user():
+    """Deletes the user from the database
+    Usage: 0.0.0.0/delete?username=<username>"""
+    username = request.values.get("username")
+    if username is None:
+        return "ERROR: Request malformed", 400
+    try:
+        container.delete_item(username, partition_key=PARTITION_KEY)
+        return "Okay", 200
+    except CosmosHttpResponseError:
+        return "ERROR: User not found", 400
