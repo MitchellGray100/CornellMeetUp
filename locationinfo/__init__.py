@@ -1,23 +1,12 @@
-"""The user information microservices. Manages all user information stored in
-the database
+"""The location information microservices. Manages all user location information 
+stored in the database
 
 Actions
 -------
-get - get an existing user's information
-update - update an existing user's information
-add - adds a new user's information
-delete - deletes a existing user's information
-
-User Data Object
-----------------
-id: int - id of the user
-name: str - name/username of the user
-last-online: date - time that the user was last seen
-groups: list[int] - a list of group ids
-info: dict[str,str] - profile information
-    birthday: date - birthday of the user
-    time-zone: str - timezone of the user
-    profile-picture-id: str - id of profile picture"""
+get - get an existing user's location information
+update - update an existing user's location information
+add - adds a new user's location information
+delete - delete's an existing user's location information"""
 
 import os
 import json
@@ -41,7 +30,7 @@ container = database.get_container_client(CONTAINER_NAME)
 
 
 async def main(req: func.HttpRequest) -> func.HttpResponse:
-    logging.info('userinfo lambda triggered')
+    logging.info('locationinfo lambda triggered')
 
     req_type = req.params.get('type')
 
@@ -51,11 +40,12 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
         if username is None:
             return func.HttpResponse('Request malformed: username missing', status_code=400)
         try:
-            user_object = await container.read_item(item=f'user/{username}',partition_key=PARTITION_KEY)
+            user_object = await container.read_item(item=f'location/{username}',partition_key=PARTITION_KEY)
         except CosmosHttpResponseError:
             return func.HttpResponse('User does not exist', status_code=400)
         else:
-            return func.HttpResponse(json.dumps(user_object), status_code=200)
+            res_object = {'latitude': user_object['latitude'], 'longitude': user_object['logitude']}
+            return func.HttpResponse(json.dumps(res_object), status_code=200)
 
     elif req_type == 'update':
         logging.info('    update request received')
@@ -63,11 +53,11 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
         if username is None:
             return func.HttpResponse('Request malformed: username missing', status_code=400)
         try:
-            user_object = await container.read_item(item=f'user/{username}',partition_key=PARTITION_KEY)
+            user_object = await container.read_item(item=f'location/{username}',partition_key=PARTITION_KEY)
             body: dict[str,str] = req.get_json()
-            for key in body.keys():
-                user_object[key] = body[key]
-            await container.replace_item(item=f'user/{username}',body=user_object)
+            user_object['latitude'] = body['latitude']
+            user_object['logitude'] = body['logitude']
+            await container.replace_item(item=f'location/{username}',body=user_object)
         except ValueError:
             return func.HttpResponse('Request malformed: body not json', status_code=400)
         except CosmosHttpResponseError:
@@ -93,7 +83,7 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
         if username is None:
             return func.HttpResponse('Request malformed: username missing', status_code=400)
         try:
-            await container.delete_item(item=f'user/{username}', partition_key=PARTITION_KEY)
+            await container.delete_item(item=f'location/{username}', partition_key=PARTITION_KEY)
         except CosmosHttpResponseError:
             return func.HttpResponse('User does not exist', status_code=400)
         else:
