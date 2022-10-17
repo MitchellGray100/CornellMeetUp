@@ -1,6 +1,9 @@
 # VSCode files
 .vscode/
 
+# Azure files
+local.settings.json
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
