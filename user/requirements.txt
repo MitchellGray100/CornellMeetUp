@@ -1,5 +1,0 @@
-flask
-Flask
-azure-cosmos
-python-dotenv
-aiohttp
