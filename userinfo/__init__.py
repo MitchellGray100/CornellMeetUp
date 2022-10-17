@@ -47,7 +47,7 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
         if username is None:
             return func.HttpResponse('Request malformed: username missing', status_code=400)
         try:
-            user_object = await container.read_item(item=username,partition_key=PARTITION_KEY)
+            user_object = await container.read_item(item=f'user/{username}',partition_key=PARTITION_KEY)
         except CosmosHttpResponseError:
             return func.HttpResponse('User does not exist', status_code=400)
         else:
@@ -57,12 +57,12 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
         username = req.params.get('username')
         if username is None:
             return func.HttpResponse('Request malformed: username missing', status_code=400)
-        user_object = await container.read_item(item=username,partition_key=PARTITION_KEY)
+        user_object = await container.read_item(item=f'user/{username}',partition_key=PARTITION_KEY)
         try:
             body: dict[str,str] = req.get_json()
             for key in body.keys():
                 user_object[key] = body[key]
-            container.replace_item(item=username,body=user_object)
+            container.replace_item(item=f'user/{username}',body=user_object)
         except ValueError:
             return func.HttpResponse('Request malformed: body not json', status_code=400)
         except CosmosHttpResponseError:
@@ -86,7 +86,7 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
         if username is None:
             return func.HttpResponse('Request malformed: username missing', status_code=400)
         try:
-            container.delete_item(username, partition_key=PARTITION_KEY)
+            container.delete_item(item=f'user/{username}', partition_key=PARTITION_KEY)
         except CosmosHttpResponseError:
             return func.HttpResponse('User does not exist', status_code=400)
         else:
