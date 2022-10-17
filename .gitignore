@@ -1,5 +1,6 @@
 # VSCode files
 .vscode/
+.devcontainer/
 
 # Azure files
 local.settings.json
