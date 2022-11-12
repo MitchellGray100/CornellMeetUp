@@ -6,7 +6,13 @@ Actions
 get - get an existing user's location information
 update - update an existing user's location information
 add - adds a new user's location information
-delete - delete's an existing user's location information"""
+delete - delete's an existing user's location information
+
+Location Data Object
+--------------------
+username: str - username of user (UNIQUE)
+latitude: float - latitude of coordinates
+longitude: float - longitude of coordinates"""
 
 import os
 import json
@@ -41,57 +47,74 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
         logging.info('    get request received')
         username = req.params.get('username')
         if username is None:
+            logging.error('        request malformed: username missing')
             return func.HttpResponse('Request malformed: username missing', status_code=400)
         try:
-            user_object = await container.read_item(item=f'location/{username}',partition_key=PARTITION_KEY)
+            location_object = await container.read_item(item=f'location/{username}',partition_key=PARTITION_KEY)
         except CosmosHttpResponseError:
+            logging.warn('        user does not exist')
             return func.HttpResponse('User does not exist', status_code=400)
         else:
-            res_object = {'latitude': user_object['latitude'], 'longitude': user_object['logitude']}
+            res_object = {'latitude': location_object['latitude'], 'longitude': location_object['logitude']}
+            logging.info('        request successful')
             return func.HttpResponse(json.dumps(res_object), status_code=200)
 
     elif req_type == 'update':
         logging.info('    update request received')
         username = req.params.get('username')
         if username is None:
+            logging.error('        request malformed: username missing')
             return func.HttpResponse('Request malformed: username missing', status_code=400)
         try:
-            user_object = await container.read_item(item=f'location/{username}',partition_key=PARTITION_KEY)
+            location_object = await container.read_item(item=f'location/{username}',partition_key=PARTITION_KEY)
             body: dict[str,str] = req.get_json()
-            user_object['latitude'] = body['latitude']
-            user_object['logitude'] = body['logitude']
-            await container.replace_item(item=f'location/{username}',body=user_object)
+            location_object['latitude'] = body['latitude']
+            location_object['logitude'] = body['logitude']
+            await container.replace_item(item=f'location/{username}',body=location_object)
         except ValueError:
-            return func.HttpResponse('Request malformed: body not json', status_code=400)
+            logging.error('        request malformed: body malformed')
+            return func.HttpResponse('Request malformed: body malformed', status_code=400)
         except CosmosHttpResponseError:
+            logging.warn('        user does not exist')
             return func.HttpResponse('User does not exist', status_code=400)
         else:
+            logging.info('        request successful')
             return func.HttpResponse('Okay', status_code=200)
 
     elif req_type == 'add':
         logging.info('    add request received')
         try:
+            username = req.params.get('username')
+            if username is None:
+                return func.HttpResponse('Request malformed: username missing', status_code=400)
             body: dict[str,str] = req.get_json()
-            await container.create_item(body)
+            location_object = {'username': f'/location{username}', 'latitude': body['latitude'], 'longitude': body['latitude']}
+            await container.create_item(location_object)
         except ValueError:
-            return func.HttpResponse('Request malformed: body not json', status_code=400)
+            logging.error('        request malformed: body malformed')
+            return func.HttpResponse('Request malformed: body malformed', status_code=400)
         except CosmosHttpResponseError:
-            return func.HttpResponse('User already exists', status_code=400)
+            logging.warn('        user location already exists')
+            return func.HttpResponse('User location already exists', status_code=400)
         else:
+            logging.info('        request successful')
             return func.HttpResponse('Okay', status_code=200)
         
     elif req_type == 'delete':
         logging.info('    delete request received')
         username = req.params.get('username')
         if username is None:
+            logging.error('        request malformed: username missing')
             return func.HttpResponse('Request malformed: username missing', status_code=400)
         try:
             await container.delete_item(item=f'location/{username}', partition_key=PARTITION_KEY)
         except CosmosHttpResponseError:
+            logging.warn('        user does not exist')
             return func.HttpResponse('User does not exist', status_code=400)
         else:
+            logging.info('        request successful')
             return func.HttpResponse('Okay', status_code=200)
     
     else:
-        logging.warn('    unknown request received')
+        logging.error('    unknown request received')
         return func.HttpResponse('Request malformed: unknown request type', status_code=400)

@@ -10,8 +10,7 @@ delete - deletes a existing user's information
 
 User Data Object
 ----------------
-id: int - id of the user
-name: str - name/username of the user
+username: str - username of the user (UNIQUE)
 last-online: date - time that the user was last seen
 groups: list[int] - a list of group ids
 info: dict[str,str] - profile information
@@ -52,18 +51,22 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
         logging.info('    get request received')
         username = req.params.get('username')
         if username is None:
+            logging.error('        request malformed: username missing')
             return func.HttpResponse('Request malformed: username missing', status_code=400)
         try:
             user_object = await container.read_item(item=f'user/{username}',partition_key=PARTITION_KEY)
         except CosmosHttpResponseError:
+            logging.warn('        user does not exist')
             return func.HttpResponse('User does not exist', status_code=400)
         else:
+            logging.info('        request successful')
             return func.HttpResponse(json.dumps(user_object), status_code=200)
 
     elif req_type == 'update':
         logging.info('    update request received')
         username = req.params.get('username')
         if username is None:
+            logging.error('        request malformed: username missing')
             return func.HttpResponse('Request malformed: username missing', status_code=400)
         try:
             user_object = await container.read_item(item=f'user/{username}',partition_key=PARTITION_KEY)
@@ -72,10 +75,13 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
                 user_object[key] = body[key]
             await container.replace_item(item=f'user/{username}',body=user_object)
         except ValueError:
-            return func.HttpResponse('Request malformed: body not json', status_code=400)
+            logging.error('        request malformed: body malformed')
+            return func.HttpResponse('Request malformed: body malformed', status_code=400)
         except CosmosHttpResponseError:
+            logging.warn('        user does not exist')
             return func.HttpResponse('User does not exist', status_code=400)
         else:
+            logging.info('        request successful')
             return func.HttpResponse('Okay', status_code=200)
 
     elif req_type == 'add':
@@ -84,24 +90,30 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
             body: dict[str,str] = req.get_json()
             await container.create_item(body)
         except ValueError:
-            return func.HttpResponse('Request malformed: body not json', status_code=400)
+            logging.error('        request malformed: body malformed')
+            return func.HttpResponse('Request malformed: body malformed', status_code=400)
         except CosmosHttpResponseError:
+            logging.warn('        user already exists')
             return func.HttpResponse('User already exists', status_code=400)
         else:
+            logging.info('        request successful')
             return func.HttpResponse('Okay', status_code=200)
         
     elif req_type == 'delete':
         logging.info('    delete request received')
         username = req.params.get('username')
         if username is None:
+            logging.error('        request malformed: username missing')
             return func.HttpResponse('Request malformed: username missing', status_code=400)
         try:
             await container.delete_item(item=f'user/{username}', partition_key=PARTITION_KEY)
         except CosmosHttpResponseError:
+            logging.warn('        user does not exist')
             return func.HttpResponse('User does not exist', status_code=400)
         else:
+            logging.info('        request successful')
             return func.HttpResponse('Okay', status_code=200)
     
     else:
-        logging.warn('    unknown request received')
+        logging.error('    unknown request received')
         return func.HttpResponse('Request malformed: unknown request type', status_code=400)
