@@ -53,7 +53,7 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
             logging.error('        request malformed: groupname missing')
             return func.HttpResponse('Request malformed: groupname missing', status_code=400)
         try:
-            group_object = await container.read_item(item=f'group/{groupname}',partition_key=PARTITION_KEY)
+            group_object = await container.read_item(item=f'groups_{groupname}',partition_key=PARTITION_KEY)
         except CosmosHttpResponseError:
             logging.warn('        group does not exist')
             return func.HttpResponse('Group does not exist', status_code=400)
@@ -69,7 +69,7 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
             logging.error('        request malformed: groupname missing')
             return func.HttpResponse('Request malformed: groupname missing', status_code=400)
         try:
-            group_object = await container.read_item(item=f'group/{groupname}',partition_key=PARTITION_KEY)
+            group_object = await container.read_item(item=f'groups_{groupname}',partition_key=PARTITION_KEY)
         except CosmosHttpResponseError:
             logging.warn('        group does not exist')
             return func.HttpResponse('Group does not exist', status_code=400)
@@ -89,11 +89,11 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
             logging.error('        request malformed: username missing')
             return func.HttpResponse('Request malformed: username missing', status_code=400)
         try:
-            group_object = await container.read_item(item=f'group/{groupname}',partition_key=PARTITION_KEY)
+            group_object = await container.read_item(item=f'groups_{groupname}',partition_key=PARTITION_KEY)
             members = json.loads(group_object['members'])
             members.append(username)
             group_object['members'] = json.dumps(members)
-            await container.replace_item(item=f'group/{groupname}',body=group_object)
+            await container.replace_item(item=f'groups_{groupname}',body=group_object)
         except ValueError:
             logging.critical('groupinfo internal object store missing members field')
             return func.HttpResponse('Internal server error', status_code=500)
@@ -115,11 +115,11 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
             logging.error('        request malformed: eventid missing')
             return func.HttpResponse('Request malformed: eventid missing', status_code=400)
         try:
-            group_object = await container.read_item(item=f'group/{groupname}',partition_key=PARTITION_KEY)
+            group_object = await container.read_item(item=f'groups_{groupname}',partition_key=PARTITION_KEY)
             members: list = json.loads(group_object['events'])
             members.append(eventid)
             group_object['events'] = json.dumps(members)
-            await container.replace_item(item=f'group/{groupname}',body=group_object)
+            await container.replace_item(item=f'groups_{groupname}',body=group_object)
         except ValueError:
             logging.critical('groupinfo internal object store missing events field')
             return func.HttpResponse('Internal server error', status_code=500)
@@ -141,11 +141,11 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
             logging.error('        request malformed: username missing')
             return func.HttpResponse('Request malformed: username missing', status_code=400)
         try:
-            group_object = await container.read_item(item=f'group/{groupname}',partition_key=PARTITION_KEY)
+            group_object = await container.read_item(item=f'groups_{groupname}',partition_key=PARTITION_KEY)
             members: list = json.loads(group_object['members'])
             members.remove(username)
             group_object['members'] = json.dumps(members)
-            await container.replace_item(item=f'group/{groupname}',body=group_object)
+            await container.replace_item(item=f'groups_{groupname}',body=group_object)
         except ValueError:
             logging.warn('        member already exists')
             return func.HttpResponse('Member already removed', status_code=400)
@@ -167,11 +167,11 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
             logging.error('        request malformed: eventid missing')
             return func.HttpResponse('Request malformed: eventid missing', status_code=400)
         try:
-            group_object = await container.read_item(item=f'group/{groupname}',partition_key=PARTITION_KEY)
+            group_object = await container.read_item(item=f'groups_{groupname}',partition_key=PARTITION_KEY)
             events: list = json.loads(group_object['events'])
             events.remove(eventid)
             group_object['events'] = json.dumps(events)
-            await container.replace_item(item=f'group/{groupname}',body=group_object)
+            await container.replace_item(item=f'groups_{groupname}',body=group_object)
         except ValueError:
             logging.warn('        event already removed')
             return func.HttpResponse('Event already removed', status_code=400)
@@ -189,8 +189,8 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
             if groupname is None:
                 logging.error('        request malformed: groupname missing')
                 return func.HttpResponse('Request malformed: groupname missing', status_code=400)
-            location_object = {'groupname': f'/location{groupname}', 'members': '[]', 'events': '[]'}
-            await container.create_item(location_object)
+            group_object = {'groupname': f'groups_{groupname}', 'members': '[]', 'events': '[]'}
+            await container.create_item(group_object)
         except CosmosHttpResponseError:
             logging.warn('        user already exists')
             return func.HttpResponse('User already exists', status_code=400)

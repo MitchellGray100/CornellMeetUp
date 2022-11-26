@@ -54,7 +54,7 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
             logging.error('        request malformed: username missing')
             return func.HttpResponse('Request malformed: username missing', status_code=400)
         try:
-            user_object = await container.read_item(item=f'user/{username}',partition_key=PARTITION_KEY)
+            user_object = await container.read_item(item=f'users_{username}',partition_key=PARTITION_KEY)
         except CosmosHttpResponseError:
             logging.warn('        user does not exist')
             return func.HttpResponse('User does not exist', status_code=400)
@@ -69,11 +69,11 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
             logging.error('        request malformed: username missing')
             return func.HttpResponse('Request malformed: username missing', status_code=400)
         try:
-            user_object = await container.read_item(item=f'user/{username}',partition_key=PARTITION_KEY)
+            user_object = await container.read_item(item=f'users_{username}',partition_key=PARTITION_KEY)
             body: dict[str,str] = req.get_json()
             for key in body.keys():
                 user_object[key] = body[key]
-            await container.replace_item(item=f'user/{username}',body=user_object)
+            await container.replace_item(item=f'users_{username}',body=user_object)
         except ValueError:
             logging.error('        request malformed: body malformed')
             return func.HttpResponse('Request malformed: body malformed', status_code=400)
@@ -106,7 +106,7 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
             logging.error('        request malformed: username missing')
             return func.HttpResponse('Request malformed: username missing', status_code=400)
         try:
-            await container.delete_item(item=f'user/{username}', partition_key=PARTITION_KEY)
+            await container.delete_item(item=f'users_{username}', partition_key=PARTITION_KEY)
         except CosmosHttpResponseError:
             logging.warn('        user does not exist')
             return func.HttpResponse('User does not exist', status_code=400)
