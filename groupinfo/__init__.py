@@ -189,7 +189,7 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
             if groupname is None:
                 logging.error('        request malformed: groupname missing')
                 return func.HttpResponse('Request malformed: groupname missing', status_code=400)
-            group_object = {'groupname': f'groups_{groupname}', 'members': '[]', 'events': '[]'}
+            group_object = {'id': f'groups_{groupname}', 'members': '[]', 'events': '[]'}
             await container.create_item(group_object)
         except CosmosHttpResponseError:
             logging.warn('        user already exists')

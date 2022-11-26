@@ -55,8 +55,9 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
             return func.HttpResponse('Request malformed: username missing', status_code=400)
         try:
             user_object = await container.read_item(item=f'users_{username}',partition_key=PARTITION_KEY)
-        except CosmosHttpResponseError:
-            logging.warn('        user does not exist')
+        except CosmosHttpResponseError as e:
+            logging.warn(f'        id users_{username} does not exist')
+            logging.warn(e.exc_msg)
             return func.HttpResponse('User does not exist', status_code=400)
         else:
             logging.info('        request successful')
@@ -77,8 +78,9 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
         except ValueError:
             logging.error('        request malformed: body malformed')
             return func.HttpResponse('Request malformed: body malformed', status_code=400)
-        except CosmosHttpResponseError:
-            logging.warn('        user does not exist')
+        except CosmosHttpResponseError as e:
+            logging.warn(f'        id users_{username} does not exist')
+            logging.warn(e.exc_msg)
             return func.HttpResponse('User does not exist', status_code=400)
         else:
             logging.info('        request successful')
@@ -92,8 +94,10 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
         except ValueError:
             logging.error('        request malformed: body malformed')
             return func.HttpResponse('Request malformed: body malformed', status_code=400)
-        except CosmosHttpResponseError:
-            logging.warn('        user already exists')
+        except CosmosHttpResponseError as e:
+            body: dict[str,str] = req.get_json()
+            logging.warn(f'        id users_{body["id"]} already exists')
+            logging.warn(e.exc_msg)
             return func.HttpResponse('User already exists', status_code=400)
         else:
             logging.info('        request successful')
@@ -107,8 +111,9 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
             return func.HttpResponse('Request malformed: username missing', status_code=400)
         try:
             await container.delete_item(item=f'users_{username}', partition_key=PARTITION_KEY)
-        except CosmosHttpResponseError:
-            logging.warn('        user does not exist')
+        except CosmosHttpResponseError as e:
+            logging.warn(f'        id users_{username} does not exist')
+            logging.warn(e.exc_msg)
             return func.HttpResponse('User does not exist', status_code=400)
         else:
             logging.info('        request successful')
