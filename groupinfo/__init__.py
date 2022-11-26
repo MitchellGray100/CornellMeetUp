@@ -33,7 +33,6 @@ ENDPOINT = os.environ.get("ENDPOINT") or ""
 KEY = os.environ.get("KEY") or ""
 DATABASE_NAME = os.environ.get("DATABASE_NAME") or ""
 CONTAINER_NAME = os.environ.get("CONTAINER_NAME") or ""
-PARTITION_KEY = os.environ.get("PARTITION_KEY") or ""
 
 
 client = CosmosClient(ENDPOINT, credential=KEY)
@@ -53,7 +52,7 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
             logging.error('        request malformed: groupname missing')
             return func.HttpResponse('Request malformed: groupname missing', status_code=400)
         try:
-            group_object = await container.read_item(item=f'groups_{groupname}',partition_key=PARTITION_KEY)
+            group_object = await container.read_item(item=f'groups_{groupname}',partition_key=f'groups_{groupname}')
         except CosmosHttpResponseError:
             logging.warn('        group does not exist')
             return func.HttpResponse('Group does not exist', status_code=400)
@@ -69,7 +68,7 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
             logging.error('        request malformed: groupname missing')
             return func.HttpResponse('Request malformed: groupname missing', status_code=400)
         try:
-            group_object = await container.read_item(item=f'groups_{groupname}',partition_key=PARTITION_KEY)
+            group_object = await container.read_item(item=f'groups_{groupname}',partition_key=f'groups_{groupname}')
         except CosmosHttpResponseError:
             logging.warn('        group does not exist')
             return func.HttpResponse('Group does not exist', status_code=400)
@@ -89,7 +88,7 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
             logging.error('        request malformed: username missing')
             return func.HttpResponse('Request malformed: username missing', status_code=400)
         try:
-            group_object = await container.read_item(item=f'groups_{groupname}',partition_key=PARTITION_KEY)
+            group_object = await container.read_item(item=f'groups_{groupname}',partition_key=f'groups_{groupname}')
             members = json.loads(group_object['members'])
             members.append(username)
             group_object['members'] = json.dumps(members)
@@ -115,7 +114,7 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
             logging.error('        request malformed: eventid missing')
             return func.HttpResponse('Request malformed: eventid missing', status_code=400)
         try:
-            group_object = await container.read_item(item=f'groups_{groupname}',partition_key=PARTITION_KEY)
+            group_object = await container.read_item(item=f'groups_{groupname}',partition_key=f'groups_{groupname}')
             members: list = json.loads(group_object['events'])
             members.append(eventid)
             group_object['events'] = json.dumps(members)
@@ -141,7 +140,7 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
             logging.error('        request malformed: username missing')
             return func.HttpResponse('Request malformed: username missing', status_code=400)
         try:
-            group_object = await container.read_item(item=f'groups_{groupname}',partition_key=PARTITION_KEY)
+            group_object = await container.read_item(item=f'groups_{groupname}',partition_key=f'groups_{groupname}')
             members: list = json.loads(group_object['members'])
             members.remove(username)
             group_object['members'] = json.dumps(members)
@@ -167,7 +166,7 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
             logging.error('        request malformed: eventid missing')
             return func.HttpResponse('Request malformed: eventid missing', status_code=400)
         try:
-            group_object = await container.read_item(item=f'groups_{groupname}',partition_key=PARTITION_KEY)
+            group_object = await container.read_item(item=f'groups_{groupname}',partition_key=f'groups_{groupname}')
             events: list = json.loads(group_object['events'])
             events.remove(eventid)
             group_object['events'] = json.dumps(events)

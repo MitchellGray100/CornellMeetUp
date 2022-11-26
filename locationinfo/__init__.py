@@ -30,7 +30,6 @@ ENDPOINT = os.environ.get("ENDPOINT") or ""
 KEY = os.environ.get("KEY") or ""
 DATABASE_NAME = os.environ.get("DATABASE_NAME") or ""
 CONTAINER_NAME = os.environ.get("CONTAINER_NAME") or ""
-PARTITION_KEY = os.environ.get("PARTITION_KEY") or ""
 
 
 client = CosmosClient(ENDPOINT, credential=KEY)
@@ -50,7 +49,7 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
             logging.error('        request malformed: username missing')
             return func.HttpResponse('Request malformed: username missing', status_code=400)
         try:
-            location_object = await container.read_item(item=f'locations_{username}',partition_key=PARTITION_KEY)
+            location_object = await container.read_item(item=f'locations_{username}',partition_key=f'locations_{username}')
         except CosmosHttpResponseError as e:
             logging.warn('        user does not exist')
             logging.warn(e.exc_msg)
@@ -67,7 +66,7 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
             logging.error('        request malformed: username missing')
             return func.HttpResponse('Request malformed: username missing', status_code=400)
         try:
-            location_object = await container.read_item(item=f'locations_{username}',partition_key=PARTITION_KEY)
+            location_object = await container.read_item(item=f'locations_{username}',partition_key=f'locations_{username}')
             body: dict[str,str] = req.get_json()
             location_object['latitude'] = body['latitude']
             location_object['logitude'] = body['logitude']
@@ -110,7 +109,7 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
             logging.error('        request malformed: username missing')
             return func.HttpResponse('Request malformed: username missing', status_code=400)
         try:
-            await container.delete_item(item=f'locations_{username}', partition_key=PARTITION_KEY)
+            await container.delete_item(item=f'locations_{username}', partition_key=f'locations_{username}')
         except CosmosHttpResponseError as e:
             logging.warn('        user does not exist')
             logging.warn(e.exc_msg)

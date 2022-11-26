@@ -34,7 +34,6 @@ ENDPOINT = os.environ.get("ENDPOINT") or ""
 KEY = os.environ.get("KEY") or ""
 DATABASE_NAME = os.environ.get("DATABASE_NAME") or ""
 CONTAINER_NAME = os.environ.get("CONTAINER_NAME") or ""
-PARTITION_KEY = os.environ.get("PARTITION_KEY") or ""
 
 
 client = CosmosClient(ENDPOINT, credential=KEY)
@@ -54,7 +53,7 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
             logging.error('        request malformed: username missing')
             return func.HttpResponse('Request malformed: username missing', status_code=400)
         try:
-            user_object = await container.read_item(item=f'users_{username}',partition_key=PARTITION_KEY)
+            user_object = await container.read_item(item=f'users_{username}',partition_key=f'users_{username}')
         except CosmosHttpResponseError as e:
             logging.warn(f'        id users_{username} does not exist')
             logging.warn(e.exc_msg)
@@ -70,7 +69,7 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
             logging.error('        request malformed: username missing')
             return func.HttpResponse('Request malformed: username missing', status_code=400)
         try:
-            user_object = await container.read_item(item=f'users_{username}',partition_key=PARTITION_KEY)
+            user_object = await container.read_item(item=f'users_{username}',partition_key=f'users_{username}')
             body: dict[str,str] = req.get_json()
             for key in body.keys():
                 user_object[key] = body[key]
@@ -110,7 +109,7 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
             logging.error('        request malformed: username missing')
             return func.HttpResponse('Request malformed: username missing', status_code=400)
         try:
-            await container.delete_item(item=f'users_{username}', partition_key=PARTITION_KEY)
+            await container.delete_item(item=f'users_{username}', partition_key=f'users_{username}')
         except CosmosHttpResponseError as e:
             logging.warn(f'        id users_{username} does not exist')
             logging.warn(e.exc_msg)
