@@ -32,8 +32,8 @@ load_dotenv()
 
 ENDPOINT = os.environ.get("COSMOS_ENDPOINT") or ""
 KEY = os.environ.get("COSMOS_KEY") or ""
-DATABASE_NAME = os.environ.get("GROUP_DATABASE_NAME") or ""
-CONTAINER_NAME = os.environ.get("GROUP_CONTAINER_NAME") or ""
+DATABASE_NAME = os.environ.get("DATABASE_NAME") or ""
+CONTAINER_NAME = os.environ.get("CONTAINER_NAME") or ""
 
 
 client = CosmosClient(ENDPOINT, credential=KEY)
