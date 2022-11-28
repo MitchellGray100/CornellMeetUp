@@ -20,19 +20,20 @@ events: list[str] - list of ids of events local to this group"""
 import os
 import json
 import logging
+from typing import Dict,Any
 
 import azure.functions as func
-from azure.cosmos.aio import CosmosClient
+from azure.cosmos import CosmosClient
 from azure.cosmos.exceptions import CosmosHttpResponseError
 
 from dotenv import load_dotenv
 load_dotenv()
 
 
-ENDPOINT = os.environ.get("ENDPOINT") or ""
-KEY = os.environ.get("KEY") or ""
-DATABASE_NAME = os.environ.get("DATABASE_NAME") or ""
-CONTAINER_NAME = os.environ.get("CONTAINER_NAME") or ""
+ENDPOINT = os.environ.get("COSMOS_ENDPOINT") or ""
+KEY = os.environ.get("COSMOS_KEY") or ""
+DATABASE_NAME = os.environ.get("GROUP_DATABASE_NAME") or ""
+CONTAINER_NAME = os.environ.get("GROUP_CONTAINER_NAME") or ""
 
 
 client = CosmosClient(ENDPOINT, credential=KEY)
@@ -40,7 +41,10 @@ database = client.get_database_client(DATABASE_NAME)
 container = database.get_container_client(CONTAINER_NAME)
 
 
-async def main(req: func.HttpRequest) -> func.HttpResponse:
+def get_group_object(groupname: str) -> Dict[str,Any]:
+    return list(container.query_items(f"SELECT * FROM Container AS C WHERE C.id = 'groups_{groupname}'", enable_cross_partition_query=True))[0]
+
+def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('groupinfo lambda triggered')
 
     req_type = req.params.get('type')
@@ -52,7 +56,7 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
             logging.error('        request malformed: groupname missing')
             return func.HttpResponse('Request malformed: groupname missing', status_code=400)
         try:
-            group_object = await container.read_item(item=f'groups_{groupname}',partition_key=f'groups_{groupname}')
+            group_object = get_group_object(groupname)
         except CosmosHttpResponseError:
             logging.warn('        group does not exist')
             return func.HttpResponse('Group does not exist', status_code=400)
@@ -68,7 +72,7 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
             logging.error('        request malformed: groupname missing')
             return func.HttpResponse('Request malformed: groupname missing', status_code=400)
         try:
-            group_object = await container.read_item(item=f'groups_{groupname}',partition_key=f'groups_{groupname}')
+            group_object = group_object = get_group_object(groupname)
         except CosmosHttpResponseError:
             logging.warn('        group does not exist')
             return func.HttpResponse('Group does not exist', status_code=400)
@@ -88,11 +92,11 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
             logging.error('        request malformed: username missing')
             return func.HttpResponse('Request malformed: username missing', status_code=400)
         try:
-            group_object = await container.read_item(item=f'groups_{groupname}',partition_key=f'groups_{groupname}')
+            group_object = group_object = get_group_object(groupname)
             members = json.loads(group_object['members'])
             members.append(username)
             group_object['members'] = json.dumps(members)
-            await container.replace_item(item=f'groups_{groupname}',body=group_object)
+            container.upsert_item(group_object)
         except ValueError:
             logging.critical('groupinfo internal object store missing members field')
             return func.HttpResponse('Internal server error', status_code=500)
@@ -114,11 +118,11 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
             logging.error('        request malformed: eventid missing')
             return func.HttpResponse('Request malformed: eventid missing', status_code=400)
         try:
-            group_object = await container.read_item(item=f'groups_{groupname}',partition_key=f'groups_{groupname}')
+            group_object = group_object = get_group_object(groupname)
             members: list = json.loads(group_object['events'])
             members.append(eventid)
             group_object['events'] = json.dumps(members)
-            await container.replace_item(item=f'groups_{groupname}',body=group_object)
+            container.upsert_item(group_object)
         except ValueError:
             logging.critical('groupinfo internal object store missing events field')
             return func.HttpResponse('Internal server error', status_code=500)
@@ -140,11 +144,11 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
             logging.error('        request malformed: username missing')
             return func.HttpResponse('Request malformed: username missing', status_code=400)
         try:
-            group_object = await container.read_item(item=f'groups_{groupname}',partition_key=f'groups_{groupname}')
+            group_object = group_object = get_group_object(groupname)
             members: list = json.loads(group_object['members'])
             members.remove(username)
             group_object['members'] = json.dumps(members)
-            await container.replace_item(item=f'groups_{groupname}',body=group_object)
+            container.upsert_item(group_object)
         except ValueError:
             logging.warn('        member already exists')
             return func.HttpResponse('Member already removed', status_code=400)
@@ -166,11 +170,11 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
             logging.error('        request malformed: eventid missing')
             return func.HttpResponse('Request malformed: eventid missing', status_code=400)
         try:
-            group_object = await container.read_item(item=f'groups_{groupname}',partition_key=f'groups_{groupname}')
+            group_object = group_object = get_group_object(groupname)
             events: list = json.loads(group_object['events'])
             events.remove(eventid)
             group_object['events'] = json.dumps(events)
-            await container.replace_item(item=f'groups_{groupname}',body=group_object)
+            container.upsert_item(group_object)
         except ValueError:
             logging.warn('        event already removed')
             return func.HttpResponse('Event already removed', status_code=400)
@@ -189,7 +193,7 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
                 logging.error('        request malformed: groupname missing')
                 return func.HttpResponse('Request malformed: groupname missing', status_code=400)
             group_object = {'id': f'groups_{groupname}', 'members': '[]', 'events': '[]'}
-            await container.create_item(group_object)
+            container.upsert_item(group_object)
         except CosmosHttpResponseError:
             logging.warn('        user already exists')
             return func.HttpResponse('User already exists', status_code=400)

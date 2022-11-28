@@ -28,8 +28,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-ENDPOINT = os.environ.get("ENDPOINT") or ""
-KEY = os.environ.get("KEY") or ""
+ENDPOINT = os.environ.get("COSMOS_ENDPOINT") or ""
+KEY = os.environ.get("COSMOS_KEY") or ""
 
 
 async def main(req: func.HttpRequest) -> func.HttpResponse:
