@@ -59,7 +59,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             logging.warn(e.exc_msg)
             return func.HttpResponse('User does not exist', status_code=400)
         else:
-            res_object = {'latitude': location_object['latitude'], 'longitude': location_object['logitude']}
+            res_object = {'latitude': location_object['latitude'], 'longitude': location_object['longitude']}
             logging.info('        request successful')
             return func.HttpResponse(json.dumps(res_object), status_code=200)
 
@@ -73,7 +73,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             location_object = location_object = get_location_object(username)
             body: dict[str,str] = req.get_json()
             location_object['latitude'] = body['latitude']
-            location_object['logitude'] = body['logitude']
+            location_object['longitude'] = body['longitude']
             container.upsert_item(location_object)
         except ValueError:
             logging.error('        request malformed: body malformed')
@@ -93,7 +93,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             if username is None:
                 return func.HttpResponse('Request malformed: username missing', status_code=400)
             body: dict[str,str] = req.get_json()
-            location_object = {'id': f'location_{username}', 'latitude': body['latitude'], 'longitude': body['latitude']}
+            location_object = {'id': f'location_{username}', 'latitude': body['latitude'], 'longitude': body['longitude']}
             container.upsert_item(location_object)
         except ValueError:
             logging.error('        request malformed: body malformed')
