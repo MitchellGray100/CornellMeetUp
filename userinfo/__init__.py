@@ -33,8 +33,8 @@ load_dotenv()
 
 ENDPOINT = os.environ.get("COSMOS_ENDPOINT") or ""
 KEY = os.environ.get("COSMOS_KEY") or ""
-DATABASE_NAME = os.environ.get("DATABASE_NAME") or ""
-CONTAINER_NAME = os.environ.get("CONTAINER_NAME") or ""
+DATABASE_NAME = os.environ.get("USER_DATABASE_NAME") or ""
+CONTAINER_NAME = os.environ.get("USER_CONTAINER_NAME") or ""
 
 
 client = CosmosClient(ENDPOINT, credential=KEY)
@@ -60,6 +60,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             user_object = get_user_object(username)
         except CosmosHttpResponseError as e:
             logging.warn(f'        id users_{username} does not exist')
+            logging.warn(f'{ENDPOINT}\n{KEY}\n{DATABASE_NAME}\n{CONTAINER_NAME}\n')
             logging.warn(e.exc_msg)
             return func.HttpResponse('User does not exist', status_code=400)
         else:

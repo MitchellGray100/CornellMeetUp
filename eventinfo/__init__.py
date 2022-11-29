@@ -31,8 +31,8 @@ load_dotenv()
 
 ENDPOINT = os.environ.get("COSMOS_ENDPOINT") or ""
 KEY = os.environ.get("COSMOS_KEY") or ""
-DATABASE_NAME = os.environ.get("DATABASE_NAME") or ""
-CONTAINER_NAME = os.environ.get("CONTAINER_NAME") or ""
+DATABASE_NAME = os.environ.get("USER_DATABASE_NAME") or ""
+CONTAINER_NAME = os.environ.get("USER_CONTAINER_NAME") or ""
 
 
 client = CosmosClient(ENDPOINT, credential=KEY)
@@ -40,8 +40,8 @@ database = client.get_database_client(DATABASE_NAME)
 container = database.get_container_client(CONTAINER_NAME)
 
 
-def get_event_object(username: str) -> Dict[str,Any]:
-    return list(container.query_items(f"SELECT * FROM Container AS C WHERE C.id = 'users_{username}'", enable_cross_partition_query=True))[0]
+def get_event_object(eventname: str) -> Dict[str,Any]:
+    return list(container.query_items(f"SELECT * FROM c WHERE c.id = 'events_{eventname}'", enable_cross_partition_query=True))[0]
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('eventinfo lambda triggered')

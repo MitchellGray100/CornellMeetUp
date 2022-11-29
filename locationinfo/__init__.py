@@ -29,8 +29,8 @@ load_dotenv()
 
 ENDPOINT = os.environ.get("COSMOS_ENDPOINT") or ""
 KEY = os.environ.get("COSMOS_KEY") or ""
-DATABASE_NAME = os.environ.get("DATABASE_NAME") or ""
-CONTAINER_NAME = os.environ.get("CONTAINER_NAME") or ""
+DATABASE_NAME = os.environ.get("USER_DATABASE_NAME") or ""
+CONTAINER_NAME = os.environ.get("USER_CONTAINER_NAME") or ""
 
 
 client = CosmosClient(ENDPOINT, credential=KEY)
@@ -39,7 +39,7 @@ container = database.get_container_client(CONTAINER_NAME)
 
 
 def get_location_object(username: str) -> Dict[str,Any]:
-    return list(container.query_items(f"SELECT * FROM Container AS C WHERE C.id = 'location_{username}'", enable_cross_partition_query=True))[0]
+    return list(container.query_items(f"SELECT * FROM c WHERE c.id = 'location_{username}'", enable_cross_partition_query=True))[0]
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('locationinfo lambda triggered')
@@ -55,7 +55,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         try:
             location_object = get_location_object(username)
         except CosmosHttpResponseError as e:
-            logging.warn('        user does not exist')
+            logging.warn(f'        id location_{username} does not exist')
             logging.warn(e.exc_msg)
             return func.HttpResponse('User does not exist', status_code=400)
         else:
@@ -79,7 +79,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             logging.error('        request malformed: body malformed')
             return func.HttpResponse('Request malformed: body malformed', status_code=400)
         except CosmosHttpResponseError as e:
-            logging.warn('        user does not exist')
+            logging.warn(f'        id location_{username} does not exist')
             logging.warn(e.exc_msg)
             return func.HttpResponse('User does not exist', status_code=400)
         else:
@@ -93,13 +93,14 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             if username is None:
                 return func.HttpResponse('Request malformed: username missing', status_code=400)
             body: dict[str,str] = req.get_json()
-            location_object = {'id': f'locations_{username}', 'latitude': body['latitude'], 'longitude': body['latitude']}
+            location_object = {'id': f'location_{username}', 'latitude': body['latitude'], 'longitude': body['latitude']}
             container.upsert_item(location_object)
         except ValueError:
             logging.error('        request malformed: body malformed')
             return func.HttpResponse('Request malformed: body malformed', status_code=400)
         except CosmosHttpResponseError as e:
-            logging.warn('        user location already exists')
+            body: dict[str,str] = req.get_json()
+            logging.warn(f'        id location_{body["id"]} already exist')
             logging.warn(e.exc_msg)
             return func.HttpResponse('User location already exists', status_code=400)
         else:
@@ -113,9 +114,9 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             logging.error('        request malformed: username missing')
             return func.HttpResponse('Request malformed: username missing', status_code=400)
         try:
-            container.delete_item(item=f'locations_{username}', partition_key=f'locations_{username}')
+            container.delete_item(item=f'location_{username}', partition_key=f'locations_{username}')
         except CosmosHttpResponseError as e:
-            logging.warn('        user does not exist')
+            logging.warn(f'        id location_{username} does not exist')
             logging.warn(e.exc_msg)
             return func.HttpResponse('User does not exist', status_code=400)
         else:
