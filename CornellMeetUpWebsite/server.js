@@ -4,8 +4,15 @@ const https = require("https");
 
 const app = express();
 app.use(bodyParser.urlencoded({extended: true}));
+app.use('*/css',express.static(__dirname + '/css'));
+app.use('*/js',express.static(__dirname + '/js'));
+app.use('*/images',express.static(__dirname + '/images'));
 
 app.get("/", function(req, res) {
+    res.redirect("/sign-in");
+})
+
+app.post("/register", function(req, res) {
     res.sendFile(__dirname + "/map.html");
     const url = "https://api.kanye.rest";
 
@@ -18,6 +25,22 @@ app.get("/", function(req, res) {
       })
     })
     console.log(__dirname);
+})
+
+app.get("/sign-in", function(req, res) {
+
+      res.sendFile(__dirname + "/index.html");
+      // const url = "https://api.kanye.rest";
+      //
+      // https.get(url, function(response)
+      // {
+      //   console.log(response.statusCode);
+      //   response.on("data", function(data){
+      //     const output = JSON.parse(data);
+      //     console.log(output);
+      //   })
+      // })
+      // console.log(__dirname);
 })
 //
 // app.post("/", function(req, res) {

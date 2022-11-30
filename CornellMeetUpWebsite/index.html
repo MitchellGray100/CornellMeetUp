@@ -1,176 +1,57 @@
-<!-- Pills navs -->
-<!DOCTYPE html>
-<html lang="en" dir="ltr">
+<!doctype html>
+<html lang="en">
 
 <head>
+  <title>Cornell MeetUp Login</title>
   <meta charset="utf-8">
-  <title></title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="icon" type="image/x-icon" href= "images/MeetUp Favicon.svg">
 
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+  <link rel="stylesheet" href="css/style.css">
 
 </head>
 
-<body>
-  <!-- Pills navs -->
-<ul class="nav nav-pills nav-justified mb-3" id="ex1" role="tablist">
-  <li class="nav-item" role="presentation">
-    <a class="nav-link active" id="tab-login" data-mdb-toggle="pill" href="#pills-login" role="tab"
-      aria-controls="pills-login" aria-selected="true">Login</a>
-  </li>
-  <li class="nav-item" role="presentation">
-    <a class="nav-link" id="tab-register" data-mdb-toggle="pill" href="#pills-register" role="tab"
-      aria-controls="pills-register" aria-selected="false">Register</a>
-  </li>
-</ul>
-<!-- Pills navs -->
-
-<!-- Pills content -->
-<div class="tab-content">
-  <div class="tab-pane fade show active" id="pills-login" role="tabpanel" aria-labelledby="tab-login">
-    <form>
-      <div class="text-center mb-3">
-        <p>Sign in with:</p>
-        <button type="button" class="btn btn-link btn-floating mx-1">
-          <i class="fab fa-facebook-f"></i>
-        </button>
-
-        <button type="button" class="btn btn-link btn-floating mx-1">
-          <i class="fab fa-google"></i>
-        </button>
-
-        <button type="button" class="btn btn-link btn-floating mx-1">
-          <i class="fab fa-twitter"></i>
-        </button>
-
-        <button type="button" class="btn btn-link btn-floating mx-1">
-          <i class="fab fa-github"></i>
-        </button>
+<body class="img js-fullheight" style="background-image: url(images/bg.jpg);">
+  <section class="ftco-section">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md-6 text-center mb-5">
+          <h2 class="heading-section">Cornell MeetUp</h2>
+        </div>
       </div>
-
-      <p class="text-center">or:</p>
-
-      <!-- Email input -->
-      <div class="form-outline mb-4">
-        <input type="email" id="loginName" class="form-control" />
-        <label class="form-label" for="loginName">Email or username</label>
-      </div>
-
-      <!-- Password input -->
-      <div class="form-outline mb-4">
-        <input type="password" id="loginPassword" class="form-control" />
-        <label class="form-label" for="loginPassword">Password</label>
-      </div>
-
-      <!-- 2 column grid layout -->
-      <div class="row mb-4">
-        <div class="col-md-6 d-flex justify-content-center">
-          <!-- Checkbox -->
-          <div class="form-check mb-3 mb-md-0">
-            <input class="form-check-input" type="checkbox" value="" id="loginCheck" checked />
-            <label class="form-check-label" for="loginCheck"> Remember me </label>
+      <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-4">
+          <div class="login-wrap p-0">
+            <h3 class="mb-4 text-center">Have an account?</h3>
+            <form action="#" class="signin-form">
+              <div class="form-group">
+                <input type="text" class="form-control" placeholder="Username" required>
+              </div>
+              <div class="form-group">
+                <input id="password-field" type="password" class="form-control" placeholder="Password" required>
+                <span toggle="#password-field" class="fa fa-fw fa-eye field-icon toggle-password"></span>
+              </div>
+              <div class="form-group">
+                <button id="Sign-In-Button" type="submit" class="form-control btn btn-primary submit px-3">Sign In</button>
+              </form>
+                <form class="" action="/register" method="post">
+                  <button type="submit" class="form-control btn btn-primary register">Register</button>
+                </form>
+              </div>
           </div>
         </div>
-
-        <div class="col-md-6 d-flex justify-content-center">
-          <!-- Simple link -->
-          <a href="#!">Forgot password?</a>
-        </div>
       </div>
+    </div>
+  </section>
 
-      <!-- Submit button -->
-      <button type="submit" class="btn btn-primary btn-block mb-4">Sign in</button>
-
-      <!-- Register buttons -->
-      <div class="text-center">
-        <p>Not a member? <a href="#!">Register</a></p>
-      </div>
-    </form>
-  </div>
-  <div class="tab-pane fade" id="pills-register" role="tabpanel" aria-labelledby="tab-register">
-    <form>
-      <div class="text-center mb-3">
-        <p>Sign up with:</p>
-        <button type="button" class="btn btn-link btn-floating mx-1">
-          <i class="fab fa-facebook-f"></i>
-        </button>
-
-        <button type="button" class="btn btn-link btn-floating mx-1">
-          <i class="fab fa-google"></i>
-        </button>
-
-        <button type="button" class="btn btn-link btn-floating mx-1">
-          <i class="fab fa-twitter"></i>
-        </button>
-
-        <button type="button" class="btn btn-link btn-floating mx-1">
-          <i class="fab fa-github"></i>
-        </button>
-      </div>
-
-      <p class="text-center">or:</p>
-
-      <!-- Name input -->
-      <div class="form-outline mb-4">
-        <input type="text" id="registerName" class="form-control" />
-        <label class="form-label" for="registerName">Name</label>
-      </div>
-
-      <!-- Username input -->
-      <div class="form-outline mb-4">
-        <input type="text" id="registerUsername" class="form-control" />
-        <label class="form-label" for="registerUsername">Username</label>
-      </div>
-
-      <!-- Email input -->
-      <div class="form-outline mb-4">
-        <input type="email" id="registerEmail" class="form-control" />
-        <label class="form-label" for="registerEmail">Email</label>
-      </div>
-
-      <!-- Password input -->
-      <div class="form-outline mb-4">
-        <input type="password" id="registerPassword" class="form-control" />
-        <label class="form-label" for="registerPassword">Password</label>
-      </div>
-
-      <!-- Repeat Password input -->
-      <div class="form-outline mb-4">
-        <input type="password" id="registerRepeatPassword" class="form-control" />
-        <label class="form-label" for="registerRepeatPassword">Repeat password</label>
-      </div>
-
-      <!-- Checkbox -->
-      <div class="form-check d-flex justify-content-center mb-4">
-        <input class="form-check-input me-2" type="checkbox" value="" id="registerCheck" checked
-          aria-describedby="registerCheckHelpText" />
-        <label class="form-check-label" for="registerCheck">
-          I have read and agree to the terms
-        </label>
-      </div>
-
-      <!-- Submit button -->
-      <button type="submit" class="btn btn-primary btn-block mb-3">Sign in</button>
-    </form>
-  </div>
-</div>
-<!-- Pills content -->
-<script type="text/javascript">
-apiUrl = 'https://cornellmeetup.azurewebsites.net/api/locationinfo?type=get&username=meg346';
-console.log(apiUrl);
-  fetch(apiUrl, {
-  method: 'GET'
-}).then(response => {
-    return response.json();
-    // return response.json();
-  }).then(data => {
-    // Work with JSON data here
-    // const obj = JSON.parse(data)
-    // console.log(data.longitude,data.latitude);
-    // return [data.longitude,data.latitude]
-  }).catch(err => {
-    console.log(err);
-    // Do something for an error here
-  });
-</script>
+  <script src="js/jquery.min.js"></script>
+  <script src="js/popper.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/main.js"></script>
 
 </body>
 
