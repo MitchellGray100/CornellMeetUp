@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Simple HTML Marker Animation - Azure Maps Web SDK Samples</title>
+
+  <meta charset="utf-8" />
+  <link rel="shortcut icon" href="/favicon.ico" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <meta name="description" content="This sample shows how to animate the position of a HTML marker on the map by updating the coordinates." />
+  <meta name="keywords" content="Microsoft maps, map, gis, API, SDK, animate, animation, symbol, pushpin, marker, pin" />
+  <meta name="author" content="Microsoft Azure Maps" />
+  <meta name="screenshot" content="screenshot.gif" />
+
+  <!-- Add references to the Azure Maps Map control JavaScript and CSS files. -->
+  <link href="https://atlas.microsoft.com/sdk/javascript/mapcontrol/2/atlas.min.css" rel="stylesheet" />
+  <script src="https://atlas.microsoft.com/sdk/javascript/mapcontrol/2/atlas.min.js"></script>
+
+  <script>
+    var map, marker, radius = 20;
+    var boundingBox = [-76.493715, 42.440714, -76.454211, 42.453635];
+
+    function GetMap() {
+      //Initialize a map instance.
+      map = new atlas.Map('myMap', {
+        center: [-76.480132, 42.447763],
+        // bounds: [-76.487878,42.451176 ,-76.459641 ,42.442595],
+        // maxBounds: boundingBox,
+        zoom: 15,
+        style: "satellite_road_labels",
+        renderWorldCopies: false,
+        authOptions: {
+          authType: 'subscriptionKey',
+          subscriptionKey: 'EagCYfI95TLS8s0QVYUUaGhC-yI3TdnJA-K1KagP3AI'
+        }
+      });
+
+
+      //Wait until the map resources are ready.
+      map.events.add('ready', function() {
+        datasource = new atlas.source.DataSource();
+        map.sources.add(datasource);
+
+        datasource.add(atlas.math.boundingBoxToPolygon(boundingBox));
+
+        //Create a layer to render the outline of the polygon data.
+        map.layers.add(new atlas.layer.LineLayer(datasource, null, {
+          strokeColor: 'red'
+        }));
+
+        // //Create a HTML marker and add it to the map.
+        marker = new atlas.HtmlMarker({
+          htmlContent: '<img class="pulseIcon circleImage" alt="Html Marker" src="https://scontent.fagc3-1.fna.fbcdn.net/v/t39.30808-6/307483802_5493931864058602_2042803574326332288_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=09cbfe&_nc_ohc=GyQv2RNKbFAAX_G2dfA&_nc_oc=AQnglKqXqJpU3sgIfRtNwdzfPaT76NxyjGBRSGovHRC0KkNpSHoa5ioF1NX-gLBsQlM&_nc_ht=scontent.fagc3-1.fna&oh=00_AfC9-AukwUZbm_83gcSPplheLmSqXxbYKxLg4pyRy-AArA&oe=638737B8"/>',
+          position: [5, 5]
+        });
+        marker2 = new atlas.HtmlMarker({
+          htmlContent: '<img class="pulseIcon circleImage" alt="Html Marker" src="https://media-exp1.licdn.com/dms/image/C4E03AQHGLj1lKIoLLA/profile-displayphoto-shrink_800_800/0/1649639958797?e=1674691200&v=beta&t=WKOja5KyassK3RuVibvPX5jtoxb_uElakoxerM-5qXE"/>',
+          position: [-76.480032, 42.447763]
+        });
+        map.markers.add(marker);
+        // map.markers.add(marker2);
+        //
+        // //Start the animation.
+        console.log("start animations");
+        animateMarker(0);
+        // animateMarker(marker2, 0);
+        console.log("passed animations");
+      });
+    }
+
+    function positionOnMap(timer) {
+      let output;
+      const successCallback = (position) => {
+        if (Math.floor(timer) % 10 == 0) {
+          output = [position.coords.longitude, position.coords.latitude];
+          console.log("output is" + output);
+          const data = {
+            longitude: output[0],
+            latitude: output[1]
+          };
+          marker.setOptions({
+            position: output
+          });
+          console.log(marker.position);
+          var apiUrl = 'https://cornellmeetup.azurewebsites.net/api/locationinfo?type=update&username=meg346';
+          fetch(apiUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+          }).then(response => {
+            return response.json();
+          }).then(data => {
+            // Work with JSON data here
+            const obj = JSON.parse(data);
+            // console.log(obj);
+          }).catch(err => {
+            // Do something for an error here
+          });
+        }
+      };
+
+      const errorCallback = (error) => {
+        console.log(error);
+      };
+
+      if (Math.floor(timer) % 20 == 0) {
+        navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
+        apiUrl = 'https://cornellmeetup.azurewebsites.net/api/locationinfo?type=get&username=meg346';
+        // console.log(apiUrl);
+        outputter = fetch(apiUrl, {
+          method: 'GET'
+        }).then(response => {
+          return response.json();
+        }).then(data => {
+
+        }).catch(err => {});
+      }
+
+      // return output;
+      // console.log(position.coords.longitude, position.coords.latitude);
+      // console.log(output);
+      // console.log(position.coords.latitude);
+    }
+
+    function animateMarker(timer) {
+      //Update the position of the marker for the animation frame.
+      positionOnMap(timer / 1000)
+
+      //Request the next frame of the animation.
+      requestAnimationFrame(animateMarker);
+    }
+  </script>
+  <style type="text/css">
+    .pulseIcon {
+      display: block;
+      background: orange;
+      border: 2px solid white;
+      cursor: pointer;
+      box-shadow: 0 0 0 rgba(0, 204, 255, 0.4);
+      animation: pulse 3s infinite;
+    }
+
+    .pulseIcon:hover {
+      animation: none;
+    }
+
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(0, 204, 255, 0.4);
+      }
+
+      70% {
+        box-shadow: 0 0 0 50px rgba(0, 204, 255, 0);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(0, 204, 255, 0);
+      }
+    }
+
+    .circleImage {
+      width: 40px;
+      border: 5px double lime;
+      border-radius: 100%;
+    }
+  </style>
+</head>
+
+<body onload='GetMap()'>
+  <!-- <div id="myMap" style="margin-left: 25%; margin-right: 25%; text-align: center; display:inline-block; text-align: center; position:relative;width:50%;min-width:290px;height:800px;"></div> -->
+  <div id="myMap" style="text-align: center; display:inline-block; text-align: center; position:relative;width:100%;min-width:290px;height:900px;"></div>
+
+</body>
+
+</html>

@@ -1,0 +1,15 @@
+{
+  "name": "cornellmeetup",
+  "version": "1.0.0",
+  "description": "Meetup app for CS 5412",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Mitchell Gray",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.1",
+    "express": "^4.18.2"
+  }
+}
