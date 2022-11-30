@@ -31,6 +31,7 @@ ENDPOINT = os.environ.get("COSMOS_ENDPOINT") or ""
 KEY = os.environ.get("COSMOS_KEY") or ""
 DATABASE_NAME = os.environ.get("USER_DATABASE_NAME") or ""
 CONTAINER_NAME = os.environ.get("USER_CONTAINER_NAME") or ""
+MICRO_ENDPOINT = os.environ.get("MICRO_ENDPOINT") or ""
 
 
 client = CosmosClient(ENDPOINT, credential=KEY)
@@ -42,6 +43,8 @@ def get_location_object(username: str) -> Dict[str,Any]:
     return list(container.query_items(f"SELECT * FROM c WHERE c.id = 'location_{username}'", enable_cross_partition_query=True))[0]
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
+    HEADERS = {'Access-Control-Allow-Origin': "*"}
+
     logging.info('locationinfo lambda triggered')
 
     req_type = req.params.get('type')
@@ -61,7 +64,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         else:
             res_object = {'latitude': location_object['latitude'], 'longitude': location_object['longitude']}
             logging.info('        request successful')
-            return func.HttpResponse(json.dumps(res_object), status_code=200)
+            return func.HttpResponse(json.dumps(res_object), status_code=200, headers=HEADERS)
 
     elif req_type == 'update':
         logging.info('    update request received')
@@ -84,7 +87,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             return func.HttpResponse('User does not exist', status_code=400)
         else:
             logging.info('        request successful')
-            return func.HttpResponse('Okay', status_code=200)
+            return func.HttpResponse('Okay', status_code=200, headers=HEADERS)
 
     elif req_type == 'add':
         logging.info('    add request received')
@@ -105,7 +108,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             return func.HttpResponse('User location already exists', status_code=400)
         else:
             logging.info('        request successful')
-            return func.HttpResponse('Okay', status_code=200)
+            return func.HttpResponse('Okay', status_code=200, headers=HEADERS)
         
     elif req_type == 'delete':
         logging.info('    delete request received')
@@ -121,7 +124,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             return func.HttpResponse('User does not exist', status_code=400)
         else:
             logging.info('        request successful')
-            return func.HttpResponse('Okay', status_code=200)
+            return func.HttpResponse('Okay', status_code=200, headers=HEADERS)
     
     else:
         logging.error('    unknown request received')
