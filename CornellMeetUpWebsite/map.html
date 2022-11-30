@@ -18,6 +18,9 @@
   <script src="https://atlas.microsoft.com/sdk/javascript/mapcontrol/2/atlas.min.js"></script>
 
   <script>
+    var username = "<%= username %>";
+    console.log(username);
+
     var map, marker, radius = 20;
     var boundingBox = [-76.493715, 42.440714, -76.454211, 42.453635];
 
@@ -51,13 +54,13 @@
 
         // //Create a HTML marker and add it to the map.
         marker = new atlas.HtmlMarker({
-          htmlContent: '<img class="pulseIcon circleImage" alt="Html Marker" src="https://scontent.fagc3-1.fna.fbcdn.net/v/t39.30808-6/307483802_5493931864058602_2042803574326332288_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=09cbfe&_nc_ohc=GyQv2RNKbFAAX_G2dfA&_nc_oc=AQnglKqXqJpU3sgIfRtNwdzfPaT76NxyjGBRSGovHRC0KkNpSHoa5ioF1NX-gLBsQlM&_nc_ht=scontent.fagc3-1.fna&oh=00_AfC9-AukwUZbm_83gcSPplheLmSqXxbYKxLg4pyRy-AArA&oe=638737B8"/>',
-          position: [5, 5]
+          // htmlContent: '<img class="pulseIcon circleImage" alt="Html Marker" src=""/>',
+          position: [0,0]
         });
-        marker2 = new atlas.HtmlMarker({
-          htmlContent: '<img class="pulseIcon circleImage" alt="Html Marker" src="https://media-exp1.licdn.com/dms/image/C4E03AQHGLj1lKIoLLA/profile-displayphoto-shrink_800_800/0/1649639958797?e=1674691200&v=beta&t=WKOja5KyassK3RuVibvPX5jtoxb_uElakoxerM-5qXE"/>',
-          position: [-76.480032, 42.447763]
-        });
+        // marker2 = new atlas.HtmlMarker({
+        //   htmlContent: '<img class="pulseIcon circleImage" alt="Html Marker" src=""/>',
+        //   position: [-76.480032, 42.447763]
+        // });
         map.markers.add(marker);
         // map.markers.add(marker2);
         //
@@ -72,7 +75,7 @@
     function positionOnMap(timer) {
       let output;
       const successCallback = (position) => {
-        if (Math.floor(timer) % 10 == 0) {
+        if (Math.floor(timer) % 5 == 0) {
           output = [position.coords.longitude, position.coords.latitude];
           console.log("output is" + output);
           const data = {
@@ -83,13 +86,9 @@
             position: output
           });
           console.log(marker.position);
-          var apiUrl = 'https://cornellmeetup.azurewebsites.net/api/locationinfo?type=update&username=meg346';
+          var apiUrl = 'https://cornellmeetup.azurewebsites.net/api/locationinfo?type=update&username='+username;
           fetch(apiUrl, {
             method: 'POST',
-            mode: 'no-cors',
-            headers: {
-              'Content-Type': 'application/json',
-            },
             body: JSON.stringify(data)
           }).then(response => {
             return response.json();
@@ -107,18 +106,24 @@
         console.log(error);
       };
 
-      if (Math.floor(timer) % 20 == 0) {
+      if (Math.floor(timer) % 5 == 0) {
         navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
-        apiUrl = 'https://cornellmeetup.azurewebsites.net/api/locationinfo?type=get&username=meg346';
+        apiUrl = 'https://cornellmeetup.azurewebsites.net/api/userinfo?type=get&username='+username;
         // console.log(apiUrl);
         outputter = fetch(apiUrl, {
-          method: 'GET'
+          method: 'GET',
+          mode: 'no-cors'
         }).then(response => {
+          marker.setOptions({
+              htmlContent: '<img class="pulseIcon circleImage" alt="Html Marker" src="'+data.info.profile_picture_id+'"/>'
+              // htmlContent: '<img class="pulseIcon circleImage" alt="Html Marker" src="https://media-exp1.licdn.com/dms/image/C4E03AQHGLj1lKIoLLA/profile-displayphoto-shrink_800_800/0/1649639958797?e=1674691200&v=beta&t=WKOja5KyassK3RuVibvPX5jtoxb_uElakoxerM-5qXE"/>'
+          });
           return response.json();
         }).then(data => {
 
         }).catch(err => {});
       }
+
 
       // return output;
       // console.log(position.coords.longitude, position.coords.latitude);
