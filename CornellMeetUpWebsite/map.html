@@ -18,6 +18,10 @@
   <script src="https://atlas.microsoft.com/sdk/javascript/mapcontrol/2/atlas.min.js"></script>
 
   <script>
+  function getRandomInt(max) {
+  return Math.floor(Math.random() * max);
+  }
+
     const userMap = new Map();
     const pictureMap = new Map();
 
@@ -133,6 +137,7 @@
       // console.log("made it");
 
       userMap.forEach((value, key) => {
+        console.log(key);
         // console.log(key);
         // console.log(key);
         var apiUrl = 'https://cornellmeetup.azurewebsites.net/api/userinfo?type=get&username=' + key;
@@ -143,7 +148,7 @@
           return response.json();
         }).then(data => {
           userMap.get(key).setOptions({
-            htmlContent: '<img class="pulseIcon circleImage" alt="' + key + '" src="' + data.info.profile_picture_id + '"/>'
+            htmlContent: '<img styles="border-color:"'+ "lime" +';" class="pulseIcon circleImage" alt="' + key + '" src="' + data.info.profile_picture_id + '"/>'
           });
         }).catch(err => {
           console.log(err);
@@ -153,18 +158,24 @@
     }
 
     function positionOnMap(timer) {
+        var doActions = false;
+        if(getRandomInt(100) == 1)
+        {
+          console.log("update");
+          doActions = true;
+        }
       if (groups.length != 0 && flag == true) {
         addUsers();
       }
 
-      if (Math.floor(timer) % 5 == 0 || pictureFlag == true) {
-        pictureFlag = false;
+      if (doActions) {
+        // pictureFlag = false;
         changePhotos();
       }
 
       let output;
       const successCallback = (position) => {
-        if (Math.floor(timer) % 5 == 0) {
+        if (doActions) {
           output = [position.coords.longitude, position.coords.latitude];
           // console.log("output is" + output);
           const data = {
@@ -210,7 +221,8 @@
         console.log(error);
       };
 
-      if (Math.floor(timer) % 5 == 0) {
+      if (doActions) {
+        // console.log("made it");
         navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
         apiUrl = 'https://cornellmeetup.azurewebsites.net/api/userinfo?type=get&username=' + username;
         outputter = fetch(apiUrl, {
@@ -235,6 +247,8 @@
     }
 
     function animateMarker(timer) {
+
+
       //Update the position of the marker for the animation frame.
       positionOnMap(timer / 1000)
 
@@ -273,7 +287,7 @@
 
     .circleImage {
       width: 40px;
-      border: 5px double lime;
+      border: 5px double;
       border-radius: 100%;
     }
   </style>
