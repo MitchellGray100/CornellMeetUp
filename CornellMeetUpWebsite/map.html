@@ -18,9 +18,9 @@
   <script src="https://atlas.microsoft.com/sdk/javascript/mapcontrol/2/atlas.min.js"></script>
 
   <script>
-  function getRandomInt(max) {
-  return Math.floor(Math.random() * max);
-  }
+    function getRandomInt(max) {
+      return Math.floor(Math.random() * max);
+    }
 
     const userMap = new Map();
     const pictureMap = new Map();
@@ -36,10 +36,8 @@
     var boundingBox = [-76.493715, 42.440714, -76.454211, 42.453635];
 
     function GetMap() {
-      //Initialize a map instance.
       map = new atlas.Map('myMap', {
         center: [-76.480132, 42.447763],
-        // bounds: [-76.487878,42.451176 ,-76.459641 ,42.442595],
         maxBounds: boundingBox,
         zoom: 15,
         style: "satellite_road_labels",
@@ -50,15 +48,12 @@
         }
       });
 
-
-      //Wait until the map resources are ready.
       map.events.add('ready', function() {
         datasource = new atlas.source.DataSource();
         map.sources.add(datasource);
 
         datasource.add(atlas.math.boundingBoxToPolygon(boundingBox));
 
-        //Create a layer to render the outline of the polygon data.
         map.layers.add(new atlas.layer.LineLayer(datasource, null, {
           strokeColor: 'red'
         }));
@@ -84,29 +79,16 @@
 
 
 
-        // //Create a HTML marker and add it to the map.
         marker = new atlas.HtmlMarker({
-          // htmlContent: '<img class="pulseIcon circleImage" alt="Html Marker" src=""/>',
           position: [0, 0]
         });
-        // marker2 = new atlas.HtmlMarker({
-        //   htmlContent: '<img class="pulseIcon circleImage" alt="Html Marker" src=""/>',
-        //   position: [-76.480032, 42.447763]
-        // });
         map.markers.add(marker);
-        // map.markers.add(marker2);
-        //
-        // //Start the animation.
-        console.log("start animations");
         animateMarker(0);
-        // animateMarker(marker2, 0);
-        console.log("passed animations");
       });
     }
 
     function addUsers() {
       flag = false;
-      // console.log("made it");
 
       for (var i = 0; i < groups.length; i++) {
         apiUrl = "https://cornellmeetup.azurewebsites.net/api/groupinfo?type=getmembers&groupname=" + groups[i];
@@ -115,9 +97,6 @@
         }).then(response => {
           return response.json();
         }).then(data => {
-          // console.log(groups);
-          // Work with JSON data here
-          // console.log(data);
           for (var i = 0; i < data.members.length; i++) {
             if (data.members[i] != username) {
               var newMarker = new atlas.HtmlMarker({
@@ -134,44 +113,35 @@
     }
 
     function changePhotos() {
-      // pictureFlag = false;
-      // console.log("made it");
 
       userMap.forEach((value, key) => {
-        console.log(key);
-        // console.log(key);
-        // console.log(key);
         var apiUrl = 'https://cornellmeetup.azurewebsites.net/api/userinfo?type=get&username=' + key;
-        // console.log(apiUrl);
         fetch(apiUrl, {
           method: 'GET'
         }).then(response => {
           return response.json();
         }).then(data => {
           userMap.get(key).setOptions({
-            htmlContent: '<img style="border-color:'+ "lime" +';" class="pulseIcon circleImage" alt="' + key + '" src="' + data.info.profile_picture_id + '"/>'
+            htmlContent: '<img style="border-color:' + "lime" + ';" class="pulseIcon circleImage" alt="' + key + '" src="' + data.info.profile_picture_id + '"/>'
           });
         }).catch(err => {
           console.log(err);
-          // Do something for an error here
         });
       });
     }
 
     function positionOnMap(timer) {
-        var doActions = false;
-        if(getRandomInt(100) == 1 || starting)
-        {
-          starting = false;
-          console.log("update");
-          doActions = true;
-        }
+      var doActions = false;
+      if (getRandomInt(100) == 1 || starting) {
+        starting = false;
+        console.log("Updating");
+        doActions = true;
+      }
       if (groups.length != 0 && flag == true) {
         addUsers();
       }
 
       if (doActions) {
-        // pictureFlag = false;
         changePhotos();
       }
 
@@ -179,7 +149,6 @@
       const successCallback = (position) => {
         if (doActions) {
           output = [position.coords.longitude, position.coords.latitude];
-          // console.log("output is" + output);
           const data = {
             longitude: output[0],
             latitude: output[1]
@@ -192,13 +161,10 @@
             method: 'POST',
             body: JSON.stringify(data)
           }).then(response => {
-            return response.json();
+            return response;
           }).then(data => {
-            // Work with JSON data here
-            const obj = JSON.parse(data);
-            // console.log(obj);
           }).catch(err => {
-            // Do something for an error here
+            console.log(err);
           });
 
           userMap.forEach((value, key) => {
@@ -213,7 +179,6 @@
               });
             }).catch(err => {
               console.log(err);
-              // Do something for an error here
             });
           });
         }
@@ -224,7 +189,6 @@
       };
 
       if (doActions) {
-        // console.log("made it");
         navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
         apiUrl = 'https://cornellmeetup.azurewebsites.net/api/userinfo?type=get&username=' + username;
         outputter = fetch(apiUrl, {
@@ -240,21 +204,11 @@
           console.log(err);
         });
       }
-
-
-      // return output;
-      // console.log(position.coords.longitude, position.coords.latitude);
-      // console.log(output);
-      // console.log(position.coords.latitude);
     }
 
     function animateMarker(timer) {
 
-
-      //Update the position of the marker for the animation frame.
       positionOnMap(timer / 1000)
-
-      //Request the next frame of the animation.
       requestAnimationFrame(animateMarker);
     }
   </script>
