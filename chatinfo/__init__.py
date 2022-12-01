@@ -42,7 +42,7 @@ def get_chat_object(groupname: str) -> List[Dict[str,Any]]:
         return list(container.query_items(f"SELECT * FROM Container AS C WHERE C.id = 'chats_{groupname}'", enable_cross_partition_query=True))[0]['chats']
 
 
-def main(req: func.HttpRequest) -> func.HttpResponse:
+def main(req: func.HttpRequest, outputMessage: func.Out[str]) -> func.HttpResponse:
     logging.info('chatinfo lambda triggered')
 
     req_type = req.params.get('type')
@@ -113,7 +113,20 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             logging.info('        request successful')
             return func.HttpResponse(json.dumps(response_object), status_code=200)
     elif req_type == 'send':
-        pass
+        logging.info('    send request received')
+        groupname = req.params.get('groupname')
+        username = req.params.get('username')
+        message = req.get_body().decode()
+        if groupname is None:
+            logging.error('        request malformed: groupname missing')
+            return func.HttpResponse('Request malformed: groupname missing', status_code=400)
+        elif username is None:
+            logging.error('        request malformed: username missing')
+            return func.HttpResponse('Request malformed: username missing', status_code=400)
+        message_object = {'groupname': groupname,'author': username, 'message': message}
+        outputMessage.set(json.dumps(message_object))
+        logging.info('        message successfully sent')
+        return func.HttpResponse('Okay', status_code=200)
     else:
         logging.error('    unknown request received')
         return func.HttpResponse('Request malformed: unknown request type', status_code=400)

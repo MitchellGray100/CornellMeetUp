@@ -12,6 +12,17 @@
       ]
     },
     {
+      "type": "kafka",
+      "direction": "out",
+      "name": "outputMessage",
+      "brokerList": "BrokerList",
+      "topic": "auth",
+      "username": "$ConnectionString",
+      "password": "EventHubConnectionString",
+      "protocol": "SASLSSL",
+      "authenticationMode": "PLAIN"
+    },
+    {
       "type": "http",
       "direction": "out",
       "name": "$return"
