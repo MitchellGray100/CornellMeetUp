@@ -1,0 +1,19 @@
+{
+  "scriptFile": "__init__.py",
+  "bindings": [
+    {
+      "type" : "kafkaTrigger",
+      "direction": "in",
+      "name" : "kevents",
+      "protocol" : "SASLSSL",
+      "password" : "EventHubConnectionString",
+      "topic" : "auth",
+      "authenticationMode" : "PLAIN",
+      "cardinality" : "MANY",
+      "dataType": "string",
+      "consumerGroup" : "$Default",
+      "username" : "$ConnectionString",
+      "BrokerList" : "%BrokerList%"    
+  }
+  ]
+}
