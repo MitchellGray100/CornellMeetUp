@@ -29,6 +29,7 @@
     var groups = [];
     var flag = true;
     var pictureFlag = true;
+    var starting = true;
     console.log(username);
 
     var map, marker, radius = 20;
@@ -159,8 +160,9 @@
 
     function positionOnMap(timer) {
         var doActions = false;
-        if(getRandomInt(100) == 1)
+        if(getRandomInt(100) == 1 || starting)
         {
+          starting = false;
           console.log("update");
           doActions = true;
         }
