@@ -45,6 +45,8 @@ def get_group_object(groupname: str) -> Dict[str,Any]:
     return list(container.query_items(f"SELECT * FROM c WHERE c.id = 'groups_{groupname}'", enable_cross_partition_query=True))[0]
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
+    HEADERS = {'Access-Control-Allow-Origin': "*"}
+
     logging.info('groupinfo lambda triggered')
 
     req_type = req.params.get('type')
@@ -63,7 +65,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         else:
             res_object = {'members': group_object['members']}
             logging.info('        request successful')
-            return func.HttpResponse(json.dumps(res_object), status_code=200)
+            return func.HttpResponse(json.dumps(res_object), status_code=200, headers=HEADERS)
 
     elif req_type == 'getevents':
         logging.info('    getevents request received')
@@ -79,7 +81,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         else:
             res_object = {'events': group_object['events']}
             logging.info('        request successful')
-            return func.HttpResponse(json.dumps(res_object), status_code=200)
+            return func.HttpResponse(json.dumps(res_object), status_code=200, headers=HEADERS)
 
     elif req_type == 'addmember':
         logging.info('    addmember request received')
@@ -105,7 +107,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             return func.HttpResponse('Group does not exist', status_code=400)
         else:
             logging.info('        request successful')
-            return func.HttpResponse('Okay', status_code=200)
+            return func.HttpResponse('Okay', status_code=200, headers=HEADERS)
 
     elif req_type == 'addevent':
         logging.info('    addevent request received')
@@ -131,7 +133,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             return func.HttpResponse('Group does not exist', status_code=400)
         else:
             logging.info('        request successful')
-            return func.HttpResponse('Okay', status_code=200)
+            return func.HttpResponse('Okay', status_code=200, headers=HEADERS)
         
     elif req_type == 'removemember':
         logging.info('    removemember request received')
@@ -157,7 +159,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             return func.HttpResponse('Group does not exist', status_code=400)
         else:
             logging.info('        request successful')
-            return func.HttpResponse('Okay', status_code=200)
+            return func.HttpResponse('Okay', status_code=200, headers=HEADERS)
 
     elif req_type == 'removeevent':
         logging.info('    removeevent request received')
@@ -183,7 +185,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             return func.HttpResponse('Group does not exist', status_code=400)
         else:
             logging.info('        request successful')
-            return func.HttpResponse('Okay', status_code=200)
+            return func.HttpResponse('Okay', status_code=200, headers=HEADERS)
 
     elif req_type == 'newgroup':
         logging.info('    newgroup request received')
@@ -199,7 +201,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             return func.HttpResponse('User already exists', status_code=400)
         else:
             logging.info('        request successful')
-            return func.HttpResponse('Okay', status_code=200)
+            return func.HttpResponse('Okay', status_code=200, headers=HEADERS)
     
     else:
         logging.error('    unknown request received')
