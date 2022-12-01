@@ -74,6 +74,7 @@ app.post("/create-user", function(req, res) {
   var url = "https://cornellmeetup.azurewebsites.net/api/userinfo?type=add";
   var postData = JSON.stringify({
     "id": "users_"+req.body.username,
+    "password": req.body.password,
     "last-online": "11/30/22",
     "groups": [1],
     "info": {
@@ -95,10 +96,10 @@ app.post("/create-user", function(req, res) {
   request.write(postData);
   request.end();
 
-  var username = req.body.username;
-  res.render(__dirname + "/map.html", {
-    username: username
-  });
+  // var username = req.body.username;
+  // res.render(__dirname + "/map.html", {
+  //   username: username
+  // });
 
   var locationPostData = JSON.stringify({
     "longitude": 0,
@@ -110,13 +111,15 @@ app.post("/create-user", function(req, res) {
     res.on('data', d => {
       process.stdout.write(d);
     })
-    console.log(response);
+    // console.log(response);
   })
   request.on('error', (e) => {
     console.error(e);
   });
   request.write(locationPostData);
   request.end();
+
+  res.redirect("/sign-in");
   // res.sendFile(__dirname + "/map.html", {username:username});
   // const url = "https://api.kanye.rest";
   //
