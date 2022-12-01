@@ -95,9 +95,10 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             return func.HttpResponse('Request malformed: username missing', status_code=400)
         try:
             group_object = group_object = get_group_object(groupname)
-            members = json.loads(group_object['members'])
-            members.append(username)
-            group_object['members'] = json.dumps(members)
+            # members = json.loads(group_object['members'])
+            # members.append(username)
+            # group_object['members'] = json.dumps(members)
+            group_object['members'].append(username)
             container.upsert_item(group_object)
         except ValueError:
             logging.critical('groupinfo internal object store missing members field')
@@ -121,9 +122,10 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             return func.HttpResponse('Request malformed: eventid missing', status_code=400)
         try:
             group_object = group_object = get_group_object(groupname)
-            members: list = json.loads(group_object['events'])
-            members.append(eventid)
-            group_object['events'] = json.dumps(members)
+            # members = json.loads(group_object['events'])
+            # members.append(eventid)
+            # group_object['events'] = json.dumps(members)
+            group_object['events'].append(eventid)
             container.upsert_item(group_object)
         except ValueError:
             logging.critical('groupinfo internal object store missing events field')
@@ -147,9 +149,10 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             return func.HttpResponse('Request malformed: username missing', status_code=400)
         try:
             group_object = group_object = get_group_object(groupname)
-            members: list = json.loads(group_object['members'])
-            members.remove(username)
-            group_object['members'] = json.dumps(members)
+            # members: list = json.loads(group_object['members'])
+            # members.remove(username)
+            # group_object['members'] = json.dumps(members)
+            group_object['members'].remove(username)
             container.upsert_item(group_object)
         except ValueError:
             logging.warn('        member already exists')
@@ -173,9 +176,10 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             return func.HttpResponse('Request malformed: eventid missing', status_code=400)
         try:
             group_object = group_object = get_group_object(groupname)
-            events: list = json.loads(group_object['events'])
-            events.remove(eventid)
-            group_object['events'] = json.dumps(events)
+            # events: list = json.loads(group_object['events'])
+            # events.remove(eventid)
+            # group_object['events'] = json.dumps(events)
+            group_object['events'].remove(eventid)
             container.upsert_item(group_object)
         except ValueError:
             logging.warn('        event already removed')
@@ -194,7 +198,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             if groupname is None:
                 logging.error('        request malformed: groupname missing')
                 return func.HttpResponse('Request malformed: groupname missing', status_code=400)
-            group_object = {'id': f'groups_{groupname}', 'members': '[]', 'events': '[]'}
+            group_object = {'id': f'groups_{groupname}', 'members': [], 'events': []}
             container.upsert_item(group_object)
         except CosmosHttpResponseError:
             logging.warn('        user already exists')
