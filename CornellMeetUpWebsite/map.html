@@ -5,7 +5,7 @@
   <title>Cornell MeetUp</title>
 
   <meta charset="utf-8" />
-  <link rel="icon" type="image/x-icon" href= "images/MeetUp Favicon.svg">
+  <link rel="icon" type="image/x-icon" href="images/MeetUp Favicon.svg">
 
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
   <meta name="description" content="This sample shows how to animate the position of a HTML marker on the map by updating the coordinates." />
@@ -19,7 +19,12 @@
 
   <script>
     const userMap = new Map();
+    const pictureMap = new Map();
+
     var username = "<%= username %>";
+    var groups = [];
+    var flag = true;
+    var pictureFlag = true;
     console.log(username);
 
     var map, marker, radius = 20;
@@ -54,54 +59,30 @@
         }));
 
 
-        // apiUrl = "https://cornellmeetup.azurewebsites.net/api/userinfo?type=get&username=meg346";
-        // fetch(apiUrl, {
-        //   method: 'GET'
-        // }).then(response => {
-        //   return response.json();
-        // }).then(data => {
-        //   // Work with JSON data here
-        //   // console.log(data);
-        //   for (var i = 0; i < data.members.length; i++) {
-        //     if(data.members[i] != username)
-        //     {
-        //       var newMarker = new atlas.HtmlMarker();
-        //       userMap.set(data.members[i], newMarker);
-        //       map.markers.add(newMarker);
-        //     }
-        //   }
-        // }).catch(err => {
-        //   // Do something for an error here
-        // });
 
-
-        apiUrl = "https://cornellmeetup.azurewebsites.net/api/groupinfo?type=getmembers&groupname=1";
+        apiUrl = "https://cornellmeetup.azurewebsites.net/api/userinfo?type=get&username=" + username;
         fetch(apiUrl, {
           method: 'GET'
         }).then(response => {
           return response.json();
         }).then(data => {
-          // Work with JSON data here
-          // console.log(data);
-          for (var i = 0; i < data.members.length; i++) {
-            if(data.members[i] != username)
-            {
-              var newMarker = new atlas.HtmlMarker({
-                htmlContent: '<img class="pulseIcon circleImage" alt="'+data.members[i]+'" src="'+'"/>'
-              });
-              userMap.set(data.members[i], newMarker);
-              map.markers.add(newMarker);
-            }
+          for (var i = 0; i < data.groups.length; i++) {
+            groups.push(data.groups[i]);
           }
+
         }).catch(err => {
           console.log(err);
         });
 
 
+
+
+
+
         // //Create a HTML marker and add it to the map.
         marker = new atlas.HtmlMarker({
           // htmlContent: '<img class="pulseIcon circleImage" alt="Html Marker" src=""/>',
-          position: [0,0]
+          position: [0, 0]
         });
         // marker2 = new atlas.HtmlMarker({
         //   htmlContent: '<img class="pulseIcon circleImage" alt="Html Marker" src=""/>',
@@ -118,7 +99,69 @@
       });
     }
 
+    function addUsers() {
+      flag = false;
+      // console.log("made it");
+
+      for (var i = 0; i < groups.length; i++) {
+        apiUrl = "https://cornellmeetup.azurewebsites.net/api/groupinfo?type=getmembers&groupname=" + groups[i];
+        fetch(apiUrl, {
+          method: 'GET'
+        }).then(response => {
+          return response.json();
+        }).then(data => {
+          // console.log(groups);
+          // Work with JSON data here
+          // console.log(data);
+          for (var i = 0; i < data.members.length; i++) {
+            if (data.members[i] != username) {
+              var newMarker = new atlas.HtmlMarker({
+                htmlContent: '<img class="pulseIcon circleImage" alt="' + data.members[i] + '" src="' + '"/>'
+              });
+              userMap.set(data.members[i], newMarker);
+              map.markers.add(newMarker);
+            }
+          }
+        }).catch(err => {
+          console.log(err);
+        });
+      }
+    }
+
+    function changePhotos() {
+      // pictureFlag = false;
+      // console.log("made it");
+
+      userMap.forEach((value, key) => {
+        // console.log(key);
+        // console.log(key);
+        var apiUrl = 'https://cornellmeetup.azurewebsites.net/api/userinfo?type=get&username=' + key;
+        // console.log(apiUrl);
+        fetch(apiUrl, {
+          method: 'GET'
+        }).then(response => {
+          return response.json();
+        }).then(data => {
+          userMap.get(key).setOptions({
+            htmlContent: '<img class="pulseIcon circleImage" alt="' + key + '" src="' + data.info.profile_picture_id + '"/>'
+          });
+        }).catch(err => {
+          console.log(err);
+          // Do something for an error here
+        });
+      });
+    }
+
     function positionOnMap(timer) {
+      if (groups.length != 0 && flag == true) {
+        addUsers();
+      }
+
+      if (Math.floor(timer) % 5 == 0 || pictureFlag == true) {
+        pictureFlag = false;
+        changePhotos();
+      }
+
       let output;
       const successCallback = (position) => {
         if (Math.floor(timer) % 5 == 0) {
@@ -131,7 +174,7 @@
           marker.setOptions({
             position: output
           });
-          var apiUrl = 'https://cornellmeetup.azurewebsites.net/api/locationinfo?type=update&username='+username;
+          var apiUrl = 'https://cornellmeetup.azurewebsites.net/api/locationinfo?type=update&username=' + username;
           fetch(apiUrl, {
             method: 'POST',
             body: JSON.stringify(data)
@@ -146,14 +189,14 @@
           });
 
           userMap.forEach((value, key) => {
-            var apiUrl = 'https://cornellmeetup.azurewebsites.net/api/locationinfo?type=get&username='+key;
+            var apiUrl = 'https://cornellmeetup.azurewebsites.net/api/locationinfo?type=get&username=' + key;
             fetch(apiUrl, {
               method: 'GET'
             }).then(response => {
               return response.json();
             }).then(data => {
               userMap.get(key).setOptions({
-                position: [data.longitude,data.latitude],
+                position: [data.longitude, data.latitude],
               });
             }).catch(err => {
               console.log(err);
@@ -169,14 +212,14 @@
 
       if (Math.floor(timer) % 5 == 0) {
         navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
-        apiUrl = 'https://cornellmeetup.azurewebsites.net/api/userinfo?type=get&username='+username;
+        apiUrl = 'https://cornellmeetup.azurewebsites.net/api/userinfo?type=get&username=' + username;
         outputter = fetch(apiUrl, {
           method: 'GET'
         }).then(response => {
           return response.json();
         }).then(jsonData => {
           marker.setOptions({
-              htmlContent: '<img class="pulseIcon circleImage" alt="Html Marker" src="'+jsonData.info.profile_picture_id+'"/>'
+            htmlContent: '<img class="pulseIcon circleImage" alt="Html Marker" src="' + jsonData.info.profile_picture_id + '"/>'
           });
 
         }).catch(err => {
@@ -199,6 +242,7 @@
       requestAnimationFrame(animateMarker);
     }
   </script>
+
   <style type="text/css">
     .pulseIcon {
       display: block;
