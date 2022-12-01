@@ -13,7 +13,7 @@ newgroup - create a new group
 
 Group Data Object
 --------------------
-groupname: str - name of group (UNIQUE)
+id: str - name of group (UNIQUE)
 members: list[str] - list of usernames of users in group
 events: list[str] - list of ids of events local to this group"""
 

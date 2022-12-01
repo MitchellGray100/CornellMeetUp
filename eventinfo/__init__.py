@@ -10,7 +10,7 @@ delete - deletes a existing event's information
 
 Event Data Object
 ----------------
-eventname: str - name of the event (UNIQUE)
+id: str - name of the event (UNIQUE)
 datetime: date - date and time that the event will occur
 latitude: float - latitude of the event's location
 longitude: float - longitude of the event's location
