@@ -70,19 +70,29 @@ const options = {
 //   }
 // });
 app.post("/create-user", function(req, res) {
+  var list = req.body.groups.split(",");
+  var groupList = [];
+
+  for(var i = 0; i < list.length; i++)
+  {
+    groupList.push(parseInt(list[i]));
+  }
+
   // console.log(req.body);
   var url = "https://cornellmeetup.azurewebsites.net/api/userinfo?type=add";
   var postData = JSON.stringify({
     "id": "users_"+req.body.username,
     "password": req.body.password,
     "last-online": "11/30/22",
-    "groups": [1],
+    "groups": groupList,
     "info": {
       "birthday": req.body.birthday,
       "time-zone": req.body.timezone,
       "profile_picture_id": req.body.pfp
     }
   });
+
+
   console.log("postData: " + postData);
   var request = https.request(url, options, function(response) {
     res.on('data', d => {
@@ -95,6 +105,24 @@ app.post("/create-user", function(req, res) {
   });
   request.write(postData);
   request.end();
+
+
+  for(var i = 0; i < groupList.length; i++)
+  {
+    var url = "https://cornellmeetup.azurewebsites.net/api/groupinfo?type=addmember&groupname="+groupList[i]+"&username="+req.body.username;
+
+    var request = https.request(url, function(response) {
+      res.on('data', d => {
+        process.stdout.write(d);
+      })
+      console.log(response);
+    })
+    request.on('error', (e) => {
+      console.error(e);
+    });
+    request.write(postData);
+    request.end();
+  }
 
   // var username = req.body.username;
   // res.render(__dirname + "/map.html", {

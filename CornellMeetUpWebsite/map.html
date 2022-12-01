@@ -149,7 +149,7 @@
           return response.json();
         }).then(data => {
           userMap.get(key).setOptions({
-            htmlContent: '<img styles="border-color:"'+ "lime" +';" class="pulseIcon circleImage" alt="' + key + '" src="' + data.info.profile_picture_id + '"/>'
+            htmlContent: '<img style="border-color:'+ "lime" +';" class="pulseIcon circleImage" alt="' + key + '" src="' + data.info.profile_picture_id + '"/>'
           });
         }).catch(err => {
           console.log(err);
