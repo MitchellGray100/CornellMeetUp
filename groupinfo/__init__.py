@@ -201,8 +201,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             group_object = {'id': f'groups_{groupname}', 'members': [], 'events': []}
             container.upsert_item(group_object)
         except CosmosHttpResponseError:
-            logging.warn('        user already exists')
-            return func.HttpResponse('User already exists', status_code=400)
+            logging.warn('        group already exists')
+            return func.HttpResponse('Group already exists', status_code=400)
         else:
             logging.info('        request successful')
             return func.HttpResponse('Okay', status_code=200, headers=HEADERS)

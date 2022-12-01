@@ -26,6 +26,7 @@ from typing import Dict, Any
 import azure.functions as func
 from azure.cosmos import CosmosClient
 from azure.cosmos.exceptions import CosmosHttpResponseError
+import requests
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -95,8 +96,13 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         logging.info('    add request received')
         try:
             body: dict[str,str] = req.get_json()
+            r = requests.post(f'https://cornellmeetup.azurewebsites.net/api/authservice?type=register&username={body["username"]}&password={body["password"]}', data={})
+            if not r.ok:
+                logging.error('        creating authentication failed')
+                return func.HttpResponse('Creating authentication failed', status_code=500)
+            body.pop('password')
             container.upsert_item(body)
-        except ValueError:
+        except (ValueError, KeyError):
             logging.error('        request malformed: body malformed')
             return func.HttpResponse('Request malformed: body malformed', status_code=400)
         except CosmosHttpResponseError as e:

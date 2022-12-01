@@ -6,3 +6,4 @@ azure-functions
 azure-cosmos
 python-dotenv
 aiohttp
+requests
