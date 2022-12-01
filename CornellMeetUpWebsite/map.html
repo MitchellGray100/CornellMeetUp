@@ -53,6 +53,28 @@
           strokeColor: 'red'
         }));
 
+
+        // apiUrl = "https://cornellmeetup.azurewebsites.net/api/userinfo?type=get&username=meg346";
+        // fetch(apiUrl, {
+        //   method: 'GET'
+        // }).then(response => {
+        //   return response.json();
+        // }).then(data => {
+        //   // Work with JSON data here
+        //   // console.log(data);
+        //   for (var i = 0; i < data.members.length; i++) {
+        //     if(data.members[i] != username)
+        //     {
+        //       var newMarker = new atlas.HtmlMarker();
+        //       userMap.set(data.members[i], newMarker);
+        //       map.markers.add(newMarker);
+        //     }
+        //   }
+        // }).catch(err => {
+        //   // Do something for an error here
+        // });
+
+
         apiUrl = "https://cornellmeetup.azurewebsites.net/api/groupinfo?type=getmembers&groupname=1";
         fetch(apiUrl, {
           method: 'GET'
@@ -64,15 +86,17 @@
           for (var i = 0; i < data.members.length; i++) {
             if(data.members[i] != username)
             {
-              var newMarker = new atlas.HtmlMarker();
-              console.log(data.members[i]);
+              var newMarker = new atlas.HtmlMarker({
+                htmlContent: '<img class="pulseIcon circleImage" alt="'+data.members[i]+'" src="'+'"/>'
+              });
               userMap.set(data.members[i], newMarker);
               map.markers.add(newMarker);
             }
           }
         }).catch(err => {
-          // Do something for an error here
+          console.log(err);
         });
+
 
         // //Create a HTML marker and add it to the map.
         marker = new atlas.HtmlMarker({
@@ -130,7 +154,6 @@
             }).then(data => {
               userMap.get(key).setOptions({
                 position: [data.longitude,data.latitude],
-                htmlContent: '<img class="pulseIcon circleImage" alt="Html Marker" src=""/>',
               });
             }).catch(err => {
               console.log(err);
