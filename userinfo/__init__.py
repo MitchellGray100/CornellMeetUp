@@ -96,14 +96,15 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         logging.info('    add request received')
         try:
             body: dict[str,str] = req.get_json()
-            r = requests.post(f'https://cornellmeetup.azurewebsites.net/api/authservice?type=register&username={body["username"]}&password={body["password"]}', data={})
+            r = requests.post(f'https://cornellmeetup.azurewebsites.net/api/authservice?type=register&username={body["id"]}&password={body["password"]}', data={})
             if not r.ok:
                 logging.error('        creating authentication failed')
                 return func.HttpResponse('Creating authentication failed', status_code=500)
             body.pop('password')
             container.upsert_item(body)
-        except (ValueError, KeyError):
+        except (ValueError, KeyError) as e:
             logging.error('        request malformed: body malformed')
+            logging.error(str(e))
             return func.HttpResponse('Request malformed: body malformed', status_code=400)
         except CosmosHttpResponseError as e:
             body: dict[str,str] = req.get_json()
