@@ -30,6 +30,7 @@
     var flag = true;
     var pictureFlag = true;
     var starting = true;
+    var ready = true;
     console.log(username);
 
     var map, marker, radius = 20;
@@ -132,11 +133,28 @@
 
     function positionOnMap(timer) {
       var doActions = false;
-      if (getRandomInt(100) == 1 || starting) {
-        starting = false;
-        console.log("Updating");
+      if (starting) {
+        console.log("Starting Application");
         doActions = true;
       }
+      if(getRandomInt(60) == 1 && ready == true)
+      {
+        starting = false;
+        ready = false;
+        doActions = true;
+        console.log("Ready");
+
+      }
+
+      if(getRandomInt(100) == 1)
+      {
+        starting = false;
+        ready = false;
+        doActions = true;
+        console.log("Updating");
+
+      }
+
       if (groups.length != 0 && flag == true) {
         addUsers();
       }
