@@ -51,16 +51,33 @@ app.post("/check-username", function(req, res) {
     })
 })
 
+app.post("/log-in-buffer", function(req,res) {
+  var username = req.body.username;
+  var password = req.body.password;
+  var apiUrl = "https://cornellmeetup.azurewebsites.net/api/userinfo?type=get&username=" + username;
+  var request = https.get(apiUrl, function(response) {
+    var output;
+      if(response.statusCode == 200)
+      {
+        res.redirect(307, "/map");
+      }
+      else
+      {
+        res.redirect("/failed-login");
+      }
+  });
+})
+
 app.post("/map", function(req, res) {
   var username = req.body.username;
   var password = req.body.password;
-  var apiUrl = "https://cornellmeetup.azurewebsites.net/api/authservice?type=authenticate&username=" + username + "&password=" + password;
 
+
+  var apiUrl = "https://cornellmeetup.azurewebsites.net/api/authservice?type=authenticate&username=" + username + "&password=" + password;
   var request = https.get(apiUrl, function(response) {
     var output;
     response.on("data", function(data) {
       const output = JSON.parse(data);
-      console.log(output);
       if(output == true)
       {
         res.render(__dirname + "/map.html", {
@@ -111,7 +128,6 @@ app.post("/create-user", function(req, res) {
 
 
   var request = https.request(url, options, function(response) {
-    console.log("made it to create");
     res.on('data', d => {
       process.stdout.write(d);
     })
