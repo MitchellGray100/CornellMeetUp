@@ -28,14 +28,12 @@ from azure.cosmos import CosmosClient
 from azure.cosmos.exceptions import CosmosHttpResponseError
 import requests
 
-from dotenv import load_dotenv
-load_dotenv()
-
 
 ENDPOINT = os.environ.get("COSMOS_ENDPOINT") or ""
 KEY = os.environ.get("COSMOS_KEY") or ""
 DATABASE_NAME = os.environ.get("USER_DATABASE_NAME") or ""
 CONTAINER_NAME = os.environ.get("USER_CONTAINER_NAME") or ""
+MICRO_ENDPOINT = os.environ.get("MICRO_ENDPOINT") or ""
 
 
 client = CosmosClient(ENDPOINT, credential=KEY)
@@ -98,12 +96,12 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             body: dict[str,str] = req.get_json()
             body_id = body['id']
             try:
-                get_user_object(f'users_{body_id}')
+                get_user_object(body_id)
                 logging.warn(f'        id users_{body["id"]} already exists')
                 return func.HttpResponse('User already exists', status_code=400)
-            except CosmosHttpResponseError:
+            except IndexError:
                 pass
-            r = requests.post(f'https://cornellmeetup.azurewebsites.net/api/authservice?type=register&username={body["id"]}&password={body["password"]}', data={})
+            r = requests.post(f'{MICRO_ENDPOINT}?type=register&username={body["id"]}&password={body["password"]}', data={})
             if not r.ok:
                 logging.error('        creating authentication failed')
                 logging.error(r.text)

@@ -6,14 +6,14 @@
       "direction": "in",
       "name" : "kevents",
       "protocol" : "SASLSSL",
-      "password" : "EventHubConnectionString",
+      "password" : "$EventHubsConnectionString",
       "topic" : "auth",
       "authenticationMode" : "PLAIN",
       "cardinality" : "MANY",
       "dataType": "string",
       "consumerGroup" : "$Default",
       "username" : "$ConnectionString",
-      "BrokerList" : "%BrokerList%"    
+      "BrokerList" : "$BootstrapServer"    
   }
   ]
 }

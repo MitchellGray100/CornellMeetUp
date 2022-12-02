@@ -8,9 +8,6 @@ import azure.functions as func
 from azure.cosmos import CosmosClient
 from azure.cosmos.exceptions import CosmosHttpResponseError
 
-from dotenv import load_dotenv
-load_dotenv()
-
 
 ENDPOINT = os.environ.get("COSMOS_ENDPOINT") or ""
 KEY = os.environ.get("COSMOS_KEY") or ""

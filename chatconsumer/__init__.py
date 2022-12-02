@@ -17,9 +17,6 @@ import requests
 from azure.cosmos import CosmosClient
 from azure.cosmos.exceptions import CosmosHttpResponseError
 
-from dotenv import load_dotenv
-load_dotenv()
-
 
 ENDPOINT = os.environ.get("COSMOS_ENDPOINT") or ""
 KEY = os.environ.get("COSMOS_KEY") or ""
@@ -42,8 +39,12 @@ def main(kevents: List[func.KafkaEvent]) -> None:
     for kevent in kevents:
         logging.info(f'     processed kevent {kevent.key}')
         message_object: Dict[str,str] = json.loads(kevent.get_body())
-        chat_objects = get_chat_object(message_object['groupname'])
-        chat_id = int(chat_objects[-1]['id'])+1
+        try:
+            chat_objects = get_chat_object(message_object['groupname'])
+            chat_id = int(chat_objects[-1]['id'])+1
+        except:
+            chat_objects = []
+            chat_id = 1
         chat_objects.append({'id': chat_id, 'author': message_object['author'], 'message': message_object['message']})
         container.upsert_item({'id': f'chats_{message_object["groupname"]}', 'chats': chat_objects})
         total += 1

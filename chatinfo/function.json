@@ -15,10 +15,10 @@
       "type": "kafka",
       "direction": "out",
       "name": "outputMessage",
-      "brokerList": "BrokerList",
+      "brokerList": "$BootstrapServer",
       "topic": "auth",
       "username": "$ConnectionString",
-      "password": "EventHubConnectionString",
+      "password": "$EventHubsConnectionString",
       "protocol": "SASLSSL",
       "authenticationMode": "PLAIN"
     },
