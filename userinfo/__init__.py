@@ -99,8 +99,10 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             r = requests.post(f'https://cornellmeetup.azurewebsites.net/api/authservice?type=register&username={body["id"]}&password={body["password"]}', data={})
             if not r.ok:
                 logging.error('        creating authentication failed')
+                logging.error(r.text)
                 return func.HttpResponse('Creating authentication failed', status_code=500)
             body.pop('password')
+            body['id'] = f'users_{body["id"]}'
             container.upsert_item(body)
         except (ValueError, KeyError) as e:
             logging.error('        request malformed: body malformed')

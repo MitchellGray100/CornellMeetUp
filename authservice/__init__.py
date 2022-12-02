@@ -65,7 +65,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             m = hashlib.sha256()
             m.update(pass_salt.encode())
             hashed_pass = m.hexdigest()
-            auth_object = {'username': username, 'password': hashed_pass, 'salt': salt}
+            auth_object = {'id': f'auth_{username}', 'password': hashed_pass, 'salt': salt}
             container.upsert_item(auth_object)
         except CosmosHttpResponseError:
             logging.warn('        error inserting new authentication object')
