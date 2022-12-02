@@ -35,6 +35,22 @@ app.get("/failed-register", function(req, res) {
   res.sendFile(__dirname + "/failed-register.html");
 })
 
+app.post("/check-username", function(req, res) {
+  var apiUrl = "https://cornellmeetup.azurewebsites.net/api/userinfo?type=get&username="+req.body.username;
+  var request = https.get(apiUrl, function(response) {
+    var output;
+
+    if(response.statusCode == 500)
+    {
+      res.redirect(307,"/create-user");
+    }
+    else
+    {
+      res.redirect("/failed-register");
+    }
+    })
+})
+
 app.post("/map", function(req, res) {
   var username = req.body.username;
   var password = req.body.password;
@@ -93,22 +109,13 @@ app.post("/create-user", function(req, res) {
   });
 
 
-  console.log("postData: " + postData);
-  var code = 0;
-  var request = https.request(url, options, function(response) {
-      console.log(response.statusCode);
-      code = response.statusCode;
-      if(response.statusCode == 200)
-      {
 
-        // res.on('data', d => {
-        //   process.stdout.write(d);
-        // })
-      }
-      else
-      {
-        res.redirect("/failed-register");
-      }
+  var request = https.request(url, options, function(response) {
+    console.log("made it to create");
+    res.on('data', d => {
+      process.stdout.write(d);
+    })
+    // console.log(response);
   })
   request.on('error', (e) => {
     console.error(e);
@@ -124,7 +131,7 @@ app.post("/create-user", function(req, res) {
       res.on('data', d => {
         process.stdout.write(d);
       })
-      console.log(response);
+      // console.log(response);
     })
     request.on('error', (e) => {
       console.error(e);
