@@ -14,9 +14,18 @@ app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'html');
 app.set('views', __dirname);
 
+var globalUsername ="";
 
 app.get("/", function(req, res) {
+  console.log(globalUsername)
   res.redirect("/sign-in");
+})
+
+app.post("/profile", function(req, res) {
+  console.log(globalUsername)
+  res.render(__dirname + "/profile.html", {
+    username: globalUsername
+  });
 })
 
 app.get("/register", function(req, res) {
@@ -71,7 +80,7 @@ app.post("/log-in-buffer", function(req,res) {
 app.post("/map", function(req, res) {
   var username = req.body.username;
   var password = req.body.password;
-
+  globalUsername = username;
 
   var apiUrl = "https://cornellmeetup.azurewebsites.net/api/authservice?type=authenticate&username=" + username + "&password=" + password;
   var request = https.get(apiUrl, function(response) {
@@ -116,11 +125,11 @@ app.post("/create-user", function(req, res) {
   var postData = JSON.stringify({
     "id": req.body.username,
     "password": req.body.password,
-    "last-online": "11/30/22",
+    "last_online": "11/30/22",
     "groups": groupList,
     "info": {
       "birthday": req.body.birthday,
-      "time-zone": req.body.timezone,
+      "time_zone": req.body.timezone,
       "profile_picture_id": req.body.pfp
     }
   });
