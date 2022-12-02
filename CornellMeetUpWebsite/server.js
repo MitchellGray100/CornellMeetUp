@@ -21,19 +21,44 @@ app.get("/", function(req, res) {
 
 app.get("/register", function(req, res) {
   res.sendFile(__dirname + "/register.html");
-
 })
 
 app.get("/sign-in", function(req, res) {
-
   res.sendFile(__dirname + "/index.html");
+})
+
+app.get("/failed-login", function(req, res) {
+  res.sendFile(__dirname + "/failed-login.html");
+})
+
+app.get("/failed-register", function(req, res) {
+  res.sendFile(__dirname + "/failed-register.html");
 })
 
 app.post("/map", function(req, res) {
   var username = req.body.username;
-  res.render(__dirname + "/map.html", {
-    username: username
-  });
+  var password = req.body.password;
+  var apiUrl = "https://cornellmeetup.azurewebsites.net/api/authservice?type=authenticate&username=" + username + "&password=" + password;
+
+  var request = https.get(apiUrl, function(response) {
+    var output;
+    response.on("data", function(data) {
+      const output = JSON.parse(data);
+      console.log(output);
+      if(output == true)
+      {
+        res.render(__dirname + "/map.html", {
+          username: username
+        });
+      }
+      else
+      {
+        res.redirect("/failed-login");
+      }
+    });
+
+
+  })
 })
 
 app.get("/map", function(req, res) {
@@ -51,13 +76,12 @@ app.post("/create-user", function(req, res) {
   var list = req.body.groups.split(",");
   var groupList = [];
 
-  for(var i = 0; i < list.length; i++)
-  {
+  for (var i = 0; i < list.length; i++) {
     groupList.push(parseInt(list[i]));
   }
   var url = "https://cornellmeetup.azurewebsites.net/api/userinfo?type=add";
   var postData = JSON.stringify({
-    "id": "users_"+req.body.username,
+    "id": req.body.username,
     "password": req.body.password,
     "last-online": "11/30/22",
     "groups": groupList,
@@ -70,11 +94,21 @@ app.post("/create-user", function(req, res) {
 
 
   console.log("postData: " + postData);
+  var code = 0;
   var request = https.request(url, options, function(response) {
-    res.on('data', d => {
-      process.stdout.write(d);
-    })
-    console.log(response);
+      console.log(response.statusCode);
+      code = response.statusCode;
+      if(response.statusCode == 200)
+      {
+
+        // res.on('data', d => {
+        //   process.stdout.write(d);
+        // })
+      }
+      else
+      {
+        res.redirect("/failed-register");
+      }
   })
   request.on('error', (e) => {
     console.error(e);
@@ -83,9 +117,8 @@ app.post("/create-user", function(req, res) {
   request.end();
 
 
-  for(var i = 0; i < groupList.length; i++)
-  {
-    var url = "https://cornellmeetup.azurewebsites.net/api/groupinfo?type=addmember&groupname="+groupList[i]+"&username="+req.body.username;
+  for (var i = 0; i < groupList.length; i++) {
+    var url = "https://cornellmeetup.azurewebsites.net/api/groupinfo?type=addmember&groupname=" + groupList[i] + "&username=" + req.body.username;
 
     var request = https.request(url, function(response) {
       res.on('data', d => {
@@ -119,6 +152,7 @@ app.post("/create-user", function(req, res) {
 
   res.redirect("/sign-in");
 })
+
 app.listen(3000, function() {
   console.log("Server started on port 3000");
 });
