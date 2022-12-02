@@ -4,5 +4,6 @@
 
 azure-functions
 azure-cosmos
+azure-eventhub
 aiohttp
 requests

@@ -22,6 +22,7 @@ from typing import Dict, Any, List
 import azure.functions as func
 from azure.cosmos import CosmosClient
 from azure.cosmos.exceptions import CosmosHttpResponseError
+from azure.eventhub import EventHubProducerClient, EventData
 
 
 ENDPOINT = os.environ.get("COSMOS_ENDPOINT") or ""
@@ -29,17 +30,22 @@ KEY = os.environ.get("COSMOS_KEY") or ""
 DATABASE_NAME = os.environ.get("USER_DATABASE_NAME") or ""
 CONTAINER_NAME = os.environ.get("USER_CONTAINER_NAME") or ""
 
+EVENTHUB_CONNECTION = os.environ.get("EventHubsConnectionString") or ""
+EVENTHUB_NAME = os.environ.get("EVENTHUB_NAME") or ""
+
 
 client = CosmosClient(ENDPOINT, credential=KEY)
 database = client.get_database_client(DATABASE_NAME)
 container = database.get_container_client(CONTAINER_NAME)
+
+producer = EventHubProducerClient.from_connection_string(conn_str=EVENTHUB_CONNECTION, eventhub_name=EVENTHUB_NAME)
 
 
 def get_chat_object(groupname: str) -> List[Dict[str,Any]]:
         return list(container.query_items(f"SELECT * FROM Container AS C WHERE C.id = 'chats_{groupname}'", enable_cross_partition_query=True))[0]['chats']
 
 
-def main(req: func.HttpRequest, outputMessage: func.Out[str]) -> func.HttpResponse:
+def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('chatinfo lambda triggered')
 
     req_type = req.params.get('type')
@@ -121,7 +127,7 @@ def main(req: func.HttpRequest, outputMessage: func.Out[str]) -> func.HttpRespon
             logging.error('        request malformed: username missing')
             return func.HttpResponse('Request malformed: username missing', status_code=400)
         message_object = {'groupname': groupname,'author': username, 'message': message}
-        outputMessage.set(json.dumps(message_object))
+        producer.send_event(EventData(json.dumps(message_object)))
         logging.info('        message successfully sent')
         return func.HttpResponse('Okay', status_code=200)
     else:
