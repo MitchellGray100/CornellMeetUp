@@ -7,3 +7,4 @@ azure-cosmos
 azure-eventhub
 aiohttp
 requests
+numpy
