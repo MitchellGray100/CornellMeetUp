@@ -113,17 +113,12 @@ app.post("/update-profile", function(req, res) {
       {
         actualPfp = output.info.profile_picture_id;
       }
-      console.log("groups is: " + groupList);
-      console.log("first index is:" + groupList[0]);
-      console.log("length is:" + groupList.length);
-      console.log(groupList[0] == "");
+
       if (groupList[0] != "") {
-        console.log("made it");
         actualGroups = groupList;
       }
       else
       {
-        console.log("testing");
         actualGroups = output.groups;
       }
 
