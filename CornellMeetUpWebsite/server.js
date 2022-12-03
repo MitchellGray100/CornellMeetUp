@@ -39,6 +39,104 @@ app.get("/profile", function(req, res) {
   });
 })
 
+app.post("/settings", function(req, res) {
+  console.log(globalUsername)
+  res.render(__dirname + "/settings.html", {
+    username: globalUsername
+  });
+})
+
+app.get("/settings", function(req, res) {
+  console.log(globalUsername)
+  res.render(__dirname + "/settings.html", {
+    username: globalUsername
+  });
+})
+
+app.post("/make-group", function(req, res) {
+  console.log(globalUsername)
+  res.render(__dirname + "/make-group.html", {
+    username: globalUsername
+  });
+})
+
+app.get("/make-group", function(req, res) {
+  console.log(globalUsername)
+  res.render(__dirname + "/make-group.html", {
+    username: globalUsername
+  });
+})
+
+app.post("/create-group", function(req, res) {
+  var apiUrl = "https://cornellmeetup.azurewebsites.net/api/groupinfo?type=newgroup&groupname=" + req.body.groupname;
+  var request = https.get(apiUrl, function(response) {
+    if (response.statusCode == 200) {
+      var apiUrl = "https://cornellmeetup.azurewebsites.net/api/groupinfo?type=addmember&groupname=" + req.body.groupname + "&username=" + globalUsername;
+      var request = https.get(apiUrl, function(response) {})
+
+      var apiUrl = "https://cornellmeetup.azurewebsites.net/api/userinfo?type=get&username=" + globalUsername;
+      var request = https.get(apiUrl, function(response) {
+        response.on("data", function(data) {
+          const output = JSON.parse(data);
+          var apiUrl = "https://cornellmeetup.azurewebsites.net/api/userinfo?type=update&username=" + globalUsername;
+
+          var groupList = output.groups;
+          groupList.push(req.body.groupname);
+
+          var postData = JSON.stringify({
+            "groups": groupList
+          });
+
+          var request = https.request(apiUrl, options, function(response) {
+            res.on('data', d => {
+              process.stdout.write(d);
+            });
+
+          });
+          request.on('error', (e) => {
+            console.error(e);
+          });
+          request.write(postData);
+          request.end();
+        });
+      })
+    }
+  })
+
+  res.redirect("/make-group");
+})
+
+
+app.post("/delete-profile", function(req, res) {
+  var apiUrl = "https://cornellmeetup.azurewebsites.net/api/userinfo?type=get&username=" + globalUsername;
+  var request = https.get(apiUrl, function(response) {
+    response.on("data", function(data) {
+      const output = JSON.parse(data);
+      for (var i = 0; i < output.groups.length; i++) {
+        var url = "https://cornellmeetup.azurewebsites.net/api/groupinfo?type=removemember&groupname=" + output.groups[i] + "&username=" + globalUsername;
+        var request = https.request(url, options, function(response) {
+          res.on('data', d => {
+            process.stdout.write(d);
+          })
+          // console.log(response);
+        })
+        request.on('error', (e) => {
+          console.error(e);
+        });
+        request.end();
+      }
+
+    });
+  })
+
+  var apiUrl = "https://cornellmeetup.azurewebsites.net/api/userinfo?type=delete&username=" + globalUsername;
+  var request = https.get(apiUrl, function(response) {})
+  var apiUrl = "https://cornellmeetup.azurewebsites.net/api/locationinfo?type=delete&username=" + globalUsername;
+  var request = https.get(apiUrl, function(response) {})
+
+  res.redirect("/");
+})
+
 app.get("/register", function(req, res) {
   res.sendFile(__dirname + "/register.html");
 })
@@ -74,7 +172,6 @@ app.post("/update-profile", function(req, res) {
     response.on("data", function(data) {
       const output = JSON.parse(data);
       var apiUrl = "https://cornellmeetup.azurewebsites.net/api/userinfo?type=update&username=" + globalUsername;
-      console.log(apiUrl);
       birthday = req.body.birthday;
       timezone = req.body.timezone;
       pfp = req.body.pfp;
@@ -93,31 +190,53 @@ app.post("/update-profile", function(req, res) {
 
       if (birthday) {
         actualBirthday = birthday;
-      }
-      else
-      {
+      } else {
         actualBirthday = output.info.birthday;
       }
       if (timezone) {
         actualTimezone = timezone;
-      }
-      else
-      {
+      } else {
         actualTimezone = output.info.time_zone;
       }
       if (pfp) {
         actualPfp = pfp;
-      }
-      else
-      {
+      } else {
         actualPfp = output.info.profile_picture_id;
       }
 
       if (groupList[0] != "") {
+        //removing user from all groups
+        for (var i = 0; i < output.groups.length; i++) {
+          var url = "https://cornellmeetup.azurewebsites.net/api/groupinfo?type=removemember&groupname=" + output.groups[i] + "&username=" + globalUsername;
+          console.log(url);
+          var request = https.request(url, options, function(response) {
+            res.on('data', d => {
+              process.stdout.write(d);
+            })
+            // console.log(response);
+          })
+          request.on('error', (e) => {
+            console.error(e);
+          });
+          request.end();
+        }
+        //adding user to all new groups
+        for (var i = 0; i < groupList.length; i++) {
+          var url = "https://cornellmeetup.azurewebsites.net/api/groupinfo?type=addmember&groupname=" + groupList[i] + "&username=" + globalUsername;
+          console.log(url);
+          var request = https.request(url, options, function(response) {
+            res.on('data', d => {
+              process.stdout.write(d);
+            })
+            // console.log(response);
+          })
+          request.on('error', (e) => {
+            console.error(e);
+          });
+          request.end();
+        }
         actualGroups = groupList;
-      }
-      else
-      {
+      } else {
         actualGroups = output.groups;
       }
 
@@ -130,9 +249,7 @@ app.post("/update-profile", function(req, res) {
           "profile_picture_id": actualPfp
         }
       });
-      console.log(postData);
 
-      // console.log(JSON.parse(actualPostData));
       var request = https.request(apiUrl, options, function(response) {
         res.on('data', d => {
           process.stdout.write(d);
@@ -161,7 +278,6 @@ app.post("/log-in-buffer", function(req, res) {
   var apiUrl = "https://cornellmeetup.azurewebsites.net/api/userinfo?type=get&username=" + username;
   var request = https.get(apiUrl, function(response) {
     var output;
-    console.log(response.statusCode);
     if (response.statusCode == 200) {
       res.redirect(307, "/map");
     } else {
@@ -274,7 +390,3 @@ app.post("/create-user", function(req, res) {
 app.listen(3000, function() {
   console.log("Server started on port 3000");
 });
-
-function getUserLocation(username) {
-  console.log("called method using: " + String(username));
-}

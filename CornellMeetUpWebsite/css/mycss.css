@@ -1,3 +1,17 @@
 body {
   background-color: #B31B1B;
 }
+
+.navbar-custom-buttons{
+  border: none;
+  background: none;
+  outline: none!important;
+}
+
+.navbar-custom-buttons:active{
+  border: none;
+  border-color : none;
+  background: none;
+  outline: none;
+
+}

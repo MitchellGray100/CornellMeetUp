@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-  <title>Cornell MeetUp Profile</title>
+  <title>Cornell MeetUp Groups</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="icon" type="image/x-icon" href="images/MeetUp Favicon.svg">
@@ -31,28 +31,16 @@
       <div class="row justify-content-center">
         <div class="col-md-6 col-lg-4">
           <div class="login-wrap p-0">
-            <h3 class="mb-4 text-center">Update Profile Info</h3>
-            <form action="/update-profile" class="signin-form" method="post">
-              <!-- <div class="form-group">
-                <input id="password-field" name="password" type="password" class="form-control" placeholder="Password">
-                <span toggle="#password-field" class="fa fa-fw fa-eye field-icon toggle-password"></span>
-              </div> -->
+            <h3 style="margin-bottom: 10%;" class="mb-4 text-center">Settings</h3>
+            <form action="/create-group" class="signin-form" method="post">
               <div class="form-group">
-                <input type="text" name="birthday" class="form-control" placeholder="Birthday">
-              </div>
-              <div class="form-group">
-                <input type="text" name="timezone" class="form-control" placeholder="TimeZone">
-              </div>
-              <div class="form-group">
-                <input type="text" name="pfp" class="form-control" placeholder="Profile Picture Link">
-              </div>
-              <div class="form-group">
-                <input type="text" name="groups" class="form-control" placeholder="Groups">
-              </div>
-              <div class="form-group">
-                <button id="Sign-In-Button" type="submit" class="form-control btn btn-primary submit px-3">Update Information</button>
+                <div class="form-group">
+                  <input type="text" name="groupname" class="form-control" placeholder="New Group Name">
+                </div>
+                <button style="margin-bottom: 10%;" id="Sign-In-Button" type="submit" class="form-control btn btn-primary submit px-3">Create New Group</button>
               </div>
             </form>
+
             <form class="" action="/map" method="get">
               <button style="background-color: white!important;" type="submit" class="form-control btn btn-primary login">Go Back To Map</button>
             </form>

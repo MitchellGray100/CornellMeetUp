@@ -299,10 +299,19 @@
 
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
-      <li class="nav-item active">
+      <li class="nav-item active px-5">
+        <form class="" action="/settings" method="post">
+          <button class="nav-item navbar-custom-buttons" type="submit" name="button">Settings</button>
+        </form>
+      </li>
+      <li class="nav-item active px-5">
         <form class="" action="/profile" method="post">
-          <button class="nav-item" type="submit" name="button">Profile</button>
-
+          <button class="nav-item navbar-custom-buttons" type="submit" name="button">Update Profile</button>
+        </form>
+      </li>
+      <li class="nav-item active px-5">
+        <form class="" action="/make-group" method="post">
+          <button class="navbar-custom-buttons nav-item" type="submit" name="button">Make Group</button>
         </form>
       </li>
     </ul>
@@ -314,7 +323,7 @@
 <div class="map_and_chat">
   <!-- <div id="myMap" style="margin-left: 25%; margin-right: 25%; text-align: center; display:inline-block; text-align: center; position:relative;width:50%;min-width:290px;height:800px;"></div> -->
   <div id="myMap" style="text-align: center; display:inline-block; text-align: center; position:relative;width:66%;min-width:290px;height:900px;"></div>
-  <div class="chat-div" style="background-color: yellow;"></div>
+  <div class="chat-div" style="background-color: yellow!important;"></div>
 
 </div>
 </body>
