@@ -77,6 +77,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             user_object = get_user_object(username)
             body: dict[str,str] = req.get_json()
             for key in body.keys():
+                if key == 'id':
+                    continue
                 user_object[key] = body[key]
             container.upsert_item(user_object)
         except ValueError:

@@ -46,6 +46,8 @@ def get_chat_object(groupname: str) -> List[Dict[str,Any]]:
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
+    HEADERS = {'Access-Control-Allow-Origin': "*"}
+
     logging.info('chatinfo lambda triggered')
 
     req_type = req.params.get('type')
@@ -73,7 +75,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         else:
             response_object = {'chats': chat_object[-n:]}
             logging.info('        request successful')
-            return func.HttpResponse(json.dumps(response_object), status_code=200)
+            return func.HttpResponse(json.dumps(response_object), status_code=200, headers=HEADERS)
     elif req_type == 'getafter':
         logging.info('    getafter request received')
         groupname = req.params.get('groupname')
@@ -98,7 +100,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         else:
             response_object = {'chats': result}
             logging.info('        request successful')
-            return func.HttpResponse(json.dumps(response_object), status_code=200)
+            return func.HttpResponse(json.dumps(response_object), status_code=200, headers=HEADERS)
     elif req_type == 'getall':
         logging.info('    getall request received')
         groupname = req.params.get('groupname')
@@ -114,7 +116,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         else:
             response_object = {'chats': chat_object}
             logging.info('        request successful')
-            return func.HttpResponse(json.dumps(response_object), status_code=200)
+            return func.HttpResponse(json.dumps(response_object), status_code=200, headers=HEADERS)
     elif req_type == 'send':
         logging.info('    send request received')
         groupname = req.params.get('groupname')
@@ -129,7 +131,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         message_object = {'groupname': groupname,'author': username, 'message': message}
         producer.send_event(EventData(json.dumps(message_object)))
         logging.info('        message successfully sent')
-        return func.HttpResponse('Okay', status_code=200)
+        return func.HttpResponse('Okay', status_code=200, headers=HEADERS)
     else:
         logging.error('    unknown request received')
         return func.HttpResponse('Request malformed: unknown request type', status_code=400)
