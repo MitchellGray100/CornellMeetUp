@@ -15,8 +15,7 @@ app.set('view engine', 'html');
 app.set('views', __dirname);
 
 var globalUsername = "";
-
-
+var globalPassword = "";
 const options = {
   method: 'POST'
 }
@@ -162,6 +161,7 @@ app.post("/log-in-buffer", function(req, res) {
   var apiUrl = "https://cornellmeetup.azurewebsites.net/api/userinfo?type=get&username=" + username;
   var request = https.get(apiUrl, function(response) {
     var output;
+    console.log(response.statusCode);
     if (response.statusCode == 200) {
       res.redirect(307, "/map");
     } else {
@@ -171,11 +171,9 @@ app.post("/log-in-buffer", function(req, res) {
 })
 
 app.post("/map", function(req, res) {
-  if (!globalUsername != "") {
-    var username = req.body.username;
-    var password = req.body.password;
-    globalUsername = username;
-  }
+  var username = req.body.username;
+  globalUsername = username;
+  var password = req.body.password;
 
   var apiUrl = "https://cornellmeetup.azurewebsites.net/api/authservice?type=authenticate&username=" + globalUsername + "&password=" + password;
   var request = https.get(apiUrl, function(response) {
