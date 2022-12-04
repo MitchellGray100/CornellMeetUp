@@ -321,7 +321,7 @@ app.post("/create-user", function(req, res) {
   var groupList = [];
 
   for (var i = 0; i < list.length; i++) {
-    groupList.push(parseInt(list[i]));
+    groupList.push(list[i]);
   }
   var url = "https://cornellmeetup.azurewebsites.net/api/userinfo?type=add";
   var postData = JSON.stringify({
