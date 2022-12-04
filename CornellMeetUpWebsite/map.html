@@ -36,6 +36,9 @@
     var pictureFlag = true;
     var starting = true;
     var ready = true;
+    var startChat = true;
+    var currentChatNum = 0;
+    var currentChatGroup;
     console.log(username);
 
     var map, marker, radius = 20;
@@ -74,7 +77,25 @@
           return response.json();
         }).then(data => {
           for (var i = 0; i < data.groups.length; i++) {
-            groups.push(data.groups[i]);
+            if(i == 0)
+            {
+              currentChatGroup = data.groups[i];
+            }
+             const groupDiv = document.querySelector('#groups-div');
+             const chatDiv = document.querySelector('#chat-div');
+             const groupElement = document.createElement("button");
+             groupElement.setAttribute("name", i);
+             groupElement.onclick = function () {
+              removeAllChildNodes(chatDiv);
+              currentChatNum = 0;
+              currentChatGroup = groups[groupElement.getAttribute("name")];
+              reloadChat();
+
+            };
+             groupElement.innerHTML = data.groups[i];
+             groupDiv.append(groupElement);
+
+             groups.push(data.groups[i]);
           }
 
         }).catch(err => {
@@ -170,7 +191,11 @@
         doActions = true;
         console.log("Updating");
 
-      }
+        if(startChat)
+        {
+          reloadChat();
+        }
+        startChat = false;
 
       if (groups.length != 0 && flag == true) {
         addUsers();
@@ -178,6 +203,29 @@
 
       if (doActions) {
         changePhotos();
+
+      }
+      if (doActions){
+        apiUrl = 'https://cornellmeetup.azurewebsites.net/api/chatinfo?type=getafter&groupname='+currentChatGroup+'&chatid='+currentChatNum;
+        fetch(apiUrl)
+           .then(response => response.json())
+           .then(texts => showText(texts.chats));
+
+        showText = texts => {
+         const textDiv = document.querySelector('#chat-div');
+         var counter = 0;
+         texts.forEach(text => {
+           counter++;
+           const textElement = document.createElement('div');
+           const spacing = document.createElement('p');
+           // textElement.setAttribute('style', 'display: inline-block;');
+           textElement.textContent = `${text.author}:  ${text.message}\n`;
+           textDiv.append(textElement);
+           textDiv.append(spacing);
+         });
+         currentChatNum += counter;
+        }
+     }
       }
 
       let output;
@@ -243,6 +291,55 @@
           console.log(err);
         });
       }
+    }
+
+    function sendChat()
+    {
+      var chatMessage = document.getElementById("chat-input").value;
+      const data = {
+        message: chatMessage
+      };
+      var apiUrl = 'https://cornellmeetup.azurewebsites.net/api/chatinfo?type=send&groupname=1&username=' + username;
+      fetch(apiUrl, {
+        method: 'POST',
+        body: JSON.stringify(data)
+      }).then(response => {
+        console.log(response);
+        return response;
+      }).then(data => {
+      }).catch(err => {
+        console.log(err);
+      });
+      document.getElementById("chat-input").value = '';
+    }
+
+    function reloadChat()
+    {
+      apiUrl = 'https://cornellmeetup.azurewebsites.net/api/chatinfo?type=getall&groupname='+currentChatGroup;
+      fetch(apiUrl)
+         .then(response => response.json())
+         .then(texts => showText(texts.chats));
+
+      showText = texts => {
+       const textDiv = document.querySelector('#chat-div');
+       var counter = 0;
+       texts.forEach(text => {
+         counter++;
+         const textElement = document.createElement('div');
+         const spacing = document.createElement('p');
+         // textElement.setAttribute('style', 'display: inline-block;');
+         textElement.textContent = `${text.author}:  ${text.message}\n`;
+         textDiv.append(textElement);
+         textDiv.append(spacing);
+       });
+       currentChatNum += counter;
+      }
+    }
+
+    function removeAllChildNodes(parent) {
+        while (parent.firstChild) {
+            parent.removeChild(parent.firstChild);
+        }
     }
 
     function animateMarker(timer) {
@@ -322,8 +419,16 @@
 </nav>
 <div class="map_and_chat">
   <!-- <div id="myMap" style="margin-left: 25%; margin-right: 25%; text-align: center; display:inline-block; text-align: center; position:relative;width:50%;min-width:290px;height:800px;"></div> -->
-  <div id="myMap" style="text-align: center; display:inline-block; text-align: center; position:relative;width:66%;min-width:290px;height:900px;"></div>
-  <div class="chat-div" style="background-color: yellow!important;"></div>
+  <div id="myMap" style="float: left; display:inline-block;width:66%;min-width:290px;height:850px;"></div>
+  <div class="">
+    <div id="groups-div" style="overflow-x: scroll; position: relative; background-color: white; height: 100%; width: 34%; display: inline-block;"></div>
+    <div id="chat-div" style="float: left; background-color: #ADADAD; white-space: initial; overflow-wrap: break-word; overflow-y: scroll; overflow-x: hidden; position: relative ;height: 745px; width: 34%; display: inline-block;"></div>
+    <div id="submission-div" style="position: relative; background-color: white; height: 50px; width: 34%; display: inline-block;">
+      <input id="chat-input" style="width:80%; height:100%;" type="text" name="chat-input" value="" placeholder="Chat message to send here">
+      <button onclick="sendChat()" style="width: 19%; height:100%;"type="submit" name="button">Send</button>
+    </div>
+  </div>
+
 
 </div>
 </body>
