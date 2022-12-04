@@ -197,9 +197,10 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                 return func.HttpResponse('Request malformed: groupname missing', status_code=400)
             try:
                 group_object = get_group_object(groupname)
-            except:
                 logging.warn('        group already exists')
                 return func.HttpResponse('Group already exists', status_code=400)
+            except:
+                pass
             group_object = {'id': f'groups_{groupname}', 'members': [], 'events': []}
             container.upsert_item(group_object)
             container.upsert_item({'id': f'chats_{groupname}', 'chats': []})

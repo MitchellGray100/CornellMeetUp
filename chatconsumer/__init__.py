@@ -43,9 +43,11 @@ def callback(partition_context: PartitionContext, events: List[EventData]) -> No
         message_object: Dict[str,str] = json.loads(event.body_as_str())
         try:
             chat_objects = get_chat_object(message_object['groupname'])
-            chat_id = int(chat_objects[-1]['id'])+1
         except:
             chat_objects = []
+        try:
+            chat_id = int(chat_objects[-1]['id'])+1
+        except:
             chat_id = 1
         chat_objects.append({'id': chat_id, 'author': message_object['author'], 'message': message_object['message']})
         container.upsert_item({'id': f'chats_{message_object["groupname"]}', 'chats': chat_objects})

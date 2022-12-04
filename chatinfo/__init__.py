@@ -90,7 +90,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             chat_object = get_chat_object(groupname)
             result = []
             for chat in chat_object[::-1]:
-                if chat['id'] == int(chatid):
+                if chat['id'] <= int(chatid):
                     break
                 result.append(chat)
         except CosmosHttpResponseError as e:
