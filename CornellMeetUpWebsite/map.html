@@ -296,13 +296,10 @@
     function sendChat()
     {
       var chatMessage = document.getElementById("chat-input").value;
-      const data = {
-        message: chatMessage
-      };
       var apiUrl = 'https://cornellmeetup.azurewebsites.net/api/chatinfo?type=send&groupname=1&username=' + username;
       fetch(apiUrl, {
         method: 'POST',
-        body: JSON.stringify(data)
+        body: chatMessage
       }).then(response => {
         console.log(response);
         return response;
