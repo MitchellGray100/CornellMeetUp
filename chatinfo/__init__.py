@@ -90,7 +90,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             chat_object = get_chat_object(groupname)
             result = []
             for chat in chat_object[::-1]:
-                if chat['id'] == chatid:
+                if chat['id'] == int(chatid):
                     break
                 result.append(chat)
         except CosmosHttpResponseError as e:
@@ -98,7 +98,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             logging.warn(e.exc_msg)
             return func.HttpResponse('Chat object does not exist', status_code=400)
         else:
-            response_object = {'chats': result}
+            response_object = {'chats': result[::-1]}
             logging.info('        request successful')
             return func.HttpResponse(json.dumps(response_object), status_code=200, headers=HEADERS)
     elif req_type == 'getall':

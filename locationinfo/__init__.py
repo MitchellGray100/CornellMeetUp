@@ -114,7 +114,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             logging.error('        request malformed: username missing')
             return func.HttpResponse('Request malformed: username missing', status_code=400)
         try:
-            container.delete_item(item=f'location_{username}', partition_key=f'locations_{username}')
+            container.delete_item(item=f'location_{username}', partition_key=f'location_{username}')
         except CosmosHttpResponseError as e:
             logging.warn(f'        id location_{username} does not exist')
             logging.warn(e.exc_msg)
