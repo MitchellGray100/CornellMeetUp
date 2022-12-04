@@ -39,6 +39,7 @@
     var startChat = true;
     var currentChatNum = 0;
     var currentChatGroup;
+    var chatLoadedOnce = false;
     console.log(username);
 
     var map, marker, radius = 20;
@@ -85,18 +86,18 @@
              const chatDiv = document.querySelector('#chat-div');
              const groupElement = document.createElement("button");
              groupElement.setAttribute("name", i);
-             groupElement.onclick = function () {
+             groupElement.onclick = function(){
               removeAllChildNodes(chatDiv);
               currentChatNum = 0;
               currentChatGroup = groups[groupElement.getAttribute("name")];
               reloadChat();
-
-            };
+             };
              groupElement.innerHTML = data.groups[i];
              groupDiv.append(groupElement);
 
              groups.push(data.groups[i]);
           }
+          chatLoadedOnce = true;
 
         }).catch(err => {
           console.log(err);
@@ -118,10 +119,12 @@
     }
 
     function addUsers() {
+
+      starting = true;
+      ready = true;
       flag = false;
 
-      for (var i = 0; i < groups.length; i++) {
-        apiUrl = "https://cornellmeetup.azurewebsites.net/api/groupinfo?type=getmembers&groupname=" + groups[i];
+        apiUrl = "https://cornellmeetup.azurewebsites.net/api/groupinfo?type=getmembers&groupname=" + currentChatGroup;
         fetch(apiUrl, {
           method: 'GET'
         }).then(response => {
@@ -141,7 +144,7 @@
         }).catch(err => {
           console.log(err);
         });
-      }
+
     }
 
     function displayInfo(e)
@@ -190,11 +193,6 @@
         ready = false;
         doActions = true;
         console.log("Updating");
-
-        if(startChat)
-        {
-          reloadChat();
-        }
         startChat = false;
 
       if (groups.length != 0 && flag == true) {
@@ -209,7 +207,11 @@
         apiUrl = 'https://cornellmeetup.azurewebsites.net/api/chatinfo?type=getafter&groupname='+currentChatGroup+'&chatid='+currentChatNum;
         fetch(apiUrl)
            .then(response => response.json())
-           .then(texts => showText(texts.chats));
+           .then(texts =>
+             {
+             showText(texts.chats)
+           }
+           );
 
         showText = texts => {
          const textDiv = document.querySelector('#chat-div');
@@ -296,22 +298,37 @@
     function sendChat()
     {
       var chatMessage = document.getElementById("chat-input").value;
-      var apiUrl = 'https://cornellmeetup.azurewebsites.net/api/chatinfo?type=send&groupname=1&username=' + username;
+      const textDiv = document.querySelector('#chat-div');
+      document.getElementById("chat-input").value = '';
+      currentChatNum++;
+      const textElement = document.createElement('div');
+      const spacing = document.createElement('p');
+      // textElement.setAttribute('style', 'display: inline-block;');
+      textElement.textContent = username + ": " + chatMessage;
+      textDiv.append(textElement);
+      textDiv.append(spacing);
+      var apiUrl = 'https://cornellmeetup.azurewebsites.net/api/chatinfo?type=send&groupname=' + currentChatGroup + '&username=' + username;
       fetch(apiUrl, {
         method: 'POST',
         body: chatMessage
       }).then(response => {
-        console.log(response);
         return response;
       }).then(data => {
       }).catch(err => {
         console.log(err);
       });
-      document.getElementById("chat-input").value = '';
     }
 
     function reloadChat()
     {
+      if(chatLoadedOnce)
+      {
+        userMap.forEach((item, i) => {
+          map.markers.remove(item);
+        });
+        addUsers();
+    }
+
       apiUrl = 'https://cornellmeetup.azurewebsites.net/api/chatinfo?type=getall&groupname='+currentChatGroup;
       fetch(apiUrl)
          .then(response => response.json())
