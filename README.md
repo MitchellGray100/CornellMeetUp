@@ -1,14 +1,16 @@
 # CornellMeetUp
 Project for CS 5412. Social Media for Cornell students.<br>
 https://cornell-meetup.azurewebsites.net/
-
+<br>
+# Original Plan For Project:
 ![Picture of planned app look](https://github.com/MitchellGray100/CornellSocial/blob/main/readme/CornellSocialPlannedApp.png?raw=true)
 
 CS 5412: Course Project Final Report
-Authors: 
-Mitchell Gray (meg346)
-Jacob Kerr (jck268)
-
+Authors: <br>
+Mitchell Gray (meg346)<br>
+Jacob Kerr (jck268)<br>
+___
+___
 # Introduction <br>
 Our application solves our problem by giving our users a platform for easily meeting up with other users, being able to better plan their days, and easily seeing where events are compared to where they are. This is important to us because people are extremely busy and being able to manage group chats, hangouts, times of events, and locations of friends/events can be very difficult when spare time is very limited. We want to do this because we would like to provide a convenient and useful solution for everyday people to solve this management problem. Somewhat similar products would be YikYak and Life360. Life 360 allows users to track their family members or friends. Premium users can also message other users. YikYak uses location to make a social media platform that allows users to interact with other users that are nearby. Ours is definitely very different and provides a unique experience.
 
@@ -24,15 +26,16 @@ The Project is a socialization app that allows users to create an account only t
 
 First off is the login page where users can log into existing accounts. Failed logins change the page to a different one that displays what went wrong.
 
+![Picture of Login Page](https://raw.githubusercontent.com/MitchellGray100/CornellMeetUp/main/README-Images/Login.PNG)
 
 
 
 
 Then we have the registration page where users can create their account. Failed registrations change the page to a different one that displays what went wrong.
-
+![Picture of Registration Page](https://raw.githubusercontent.com/MitchellGray100/CornellMeetUp/main/README-Images/Register.PNG)
 
 Next up is the actual application once a user is logged in.
-
+![Picture of Actual Application](https://raw.githubusercontent.com/MitchellGray100/CornellMeetUp/main/README-Images/Map1.PNG)
 
 
 
@@ -43,14 +46,20 @@ Next up is the actual application once a user is logged in.
 
 
 The map and chat change based on the currently selected group. By default, the group is the first group of the user. As you can see in the top right, group “1” is the first group. Below is what happens when group “2” is selected.
+![Picture of Group 2](https://raw.githubusercontent.com/MitchellGray100/CornellMeetUp/main/README-Images/Map2.PNG)
 
 The map is bound to the Cornell campus. The following pictures show how far a user can zoom out since users don’t want to be tracked all day.
+![Picture of Map Bounds](https://raw.githubusercontent.com/MitchellGray100/CornellMeetUp/main/README-Images/Bounds.PNG)
 
-
-At the top of the application there are many options. Below are the corresponding pages to those options (zoomed in to save space in the report).
+At the top of the application there are many options. Below are the corresponding pages to those options (zoomed in to save space in the report).<br>
+![Picture of Options](https://raw.githubusercontent.com/MitchellGray100/CornellMeetUp/main/README-Images/Options.PNG)
 
 # Architecture/Specification <br>
 Users currently use the application through their desktop. We plan on using Electron to port our project to ios, or android. This will be relatively easy since the backend runs on Node.JS and already scales to mobile sizes using Bootstrap. Desktop users can access the application through our website running as a first tier microservice on Azure. Data flow goes from the user end to the microservices to the database and then goes back to the user in reverse order whenever users request information.  Whenever data is sent to the database, the data goes from the user end to the microservices and then to the database and ends there. Microservices work together in multiple ways. The microservices will access the same database for the backend. Our tier one microservice, the frontend, will interact with the other microservices for getting information to display and allowing users to login. Our user microservice creates user-Obfuscation files for authentication by using the authentication microservice.
+
+# Microservice Architecture Diagram
+![Picture of Microservice Architecture Diagram](https://raw.githubusercontent.com/MitchellGray100/CornellMeetUp/main/README-Images/Microservices.PNG)
+
 
 # Technology <br>
 For our microservices, we used Azure Functions built in Python. These utilize the azure.functions library, which allows the Python functions to receive and respond to HTTP requests. To access CosmosDB, our main storage layer, we used the azure.cosmos library to access the CosmosDB REST API. We used our CosmosDB as a file system. To handle real time chat from different users to different group chats, we required a message queue with a producer and consumer model. To accomplish this, we used Azure Event Hub with Apache Kafka integration for an Apache Kafka-like message bus. We set up an Azure Function microservice to take HTTP requests for new chat messages. It connected to the Event Hub via the azure.eventinfo Python API. We then created another Azure Functions microservice that consumes the Kafka messages on the message bus. It runs on a timer every 3 seconds to pull a batch of new messages off of the queue and append them to the log of chat messages in CosmosDB. The previous microservice can then be requested to pull the newest messages for each group from the database. 
