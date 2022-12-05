@@ -4,8 +4,8 @@ https://cornell-meetup.azurewebsites.net/
 <br>
 CS 5412: Course Project Final Report<br>
 ## <b>Authors: <br>
-### Mitchell Gray (meg346)<br>
-### Jacob Kerr (jck268)</b><br>
+### [Mitchell Gray (meg346)](https://github.com/MitchellGray100)<br>
+### [Jacob Kerr (jck268)](https://github.com/jakejack13)</b><br>
 ___
 ___
 
