@@ -158,3 +158,6 @@ dmypy.json
 cython_debug/
 
 .python_packages
+
+# node_modules
+node_modules/

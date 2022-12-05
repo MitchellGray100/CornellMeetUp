@@ -387,6 +387,6 @@ app.post("/create-user", function(req, res) {
   res.redirect("/sign-in");
 })
 
-app.listen(3000, function() {
-  console.log("Server started on port 3000");
+app.listen(Number(process.env.PORT), function() {
+  console.log("Server started on port " + process.env.PORT);
 });
