@@ -9,6 +9,9 @@ CS 5412: Course Project Final Report<br>
 ___
 ___
 
+# Google Slides for Demo:<br>
+https://docs.google.com/presentation/d/1NvpO7OM1eySlyvmGFYd5nsCzMnCoXvrrvCDMqepIukI/edit?usp=sharing
+
 # Original Plan For Project:
 ![Picture of planned app look](https://github.com/MitchellGray100/CornellSocial/blob/main/readme/CornellSocialPlannedApp.png?raw=true)
 
