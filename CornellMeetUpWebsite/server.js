@@ -14,56 +14,39 @@ app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'html');
 app.set('views', __dirname);
 
-var globalUsername = "";
-var globalPassword = "";
 const options = {
   method: 'POST'
 }
 
 app.get("/", function(req, res) {
-  console.log(globalUsername)
   res.redirect("/sign-in");
 })
 
 app.post("/profile", function(req, res) {
-  console.log(globalUsername)
   res.render(__dirname + "/profile.html", {
-    username: globalUsername
-  });
-})
-
-app.get("/profile", function(req, res) {
-  console.log(globalUsername)
-  res.render(__dirname + "/profile.html", {
-    username: globalUsername
+    username: req.body.username
   });
 })
 
 app.post("/settings", function(req, res) {
-  console.log(globalUsername)
+  console.log(req.body.username);
+
   res.render(__dirname + "/settings.html", {
-    username: globalUsername
+    username: req.body.username
   });
 })
 
 app.get("/settings", function(req, res) {
-  console.log(globalUsername)
+  console.log(req.body.username);
   res.render(__dirname + "/settings.html", {
-    username: globalUsername
+    username: req.body.username
   });
 })
 
 app.post("/make-group", function(req, res) {
-  console.log(globalUsername)
-  res.render(__dirname + "/make-group.html", {
-    username: globalUsername
-  });
-})
 
-app.get("/make-group", function(req, res) {
-  console.log(globalUsername)
   res.render(__dirname + "/make-group.html", {
-    username: globalUsername
+    username: req.body.username
   });
 })
 
@@ -71,14 +54,14 @@ app.post("/create-group", function(req, res) {
   var apiUrl = "https://cornellmeetup.azurewebsites.net/api/groupinfo?type=newgroup&groupname=" + req.body.groupname;
   var request = https.get(apiUrl, function(response) {
     if (response.statusCode == 200) {
-      var apiUrl = "https://cornellmeetup.azurewebsites.net/api/groupinfo?type=addmember&groupname=" + req.body.groupname + "&username=" + globalUsername;
+      var apiUrl = "https://cornellmeetup.azurewebsites.net/api/groupinfo?type=addmember&groupname=" + req.body.groupname + "&username=" + req.body.username;
       var request = https.get(apiUrl, function(response) {})
 
-      var apiUrl = "https://cornellmeetup.azurewebsites.net/api/userinfo?type=get&username=" + globalUsername;
+      var apiUrl = "https://cornellmeetup.azurewebsites.net/api/userinfo?type=get&username=" + req.body.username;
       var request = https.get(apiUrl, function(response) {
         response.on("data", function(data) {
           const output = JSON.parse(data);
-          var apiUrl = "https://cornellmeetup.azurewebsites.net/api/userinfo?type=update&username=" + globalUsername;
+          var apiUrl = "https://cornellmeetup.azurewebsites.net/api/userinfo?type=update&username=" + req.body.username;
 
           var groupList = output.groups;
           groupList.push(req.body.groupname);
@@ -103,17 +86,20 @@ app.post("/create-group", function(req, res) {
     }
   })
 
-  res.redirect("/make-group");
+  res.redirect(307, "/make-group");
 })
 
 
 app.post("/delete-profile", function(req, res) {
-  var apiUrl = "https://cornellmeetup.azurewebsites.net/api/userinfo?type=get&username=" + globalUsername;
+  var apiUrl = "https://cornellmeetup.azurewebsites.net/api/userinfo?type=get&username=" + req.body.username;
+  console.log(apiUrl);
   var request = https.get(apiUrl, function(response) {
     response.on("data", function(data) {
       const output = JSON.parse(data);
+      console.log(output);
       for (var i = 0; i < output.groups.length; i++) {
-        var url = "https://cornellmeetup.azurewebsites.net/api/groupinfo?type=removemember&groupname=" + output.groups[i] + "&username=" + globalUsername;
+        var url = "https://cornellmeetup.azurewebsites.net/api/groupinfo?type=removemember&groupname=" + output.groups[i] + "&username=" + req.body.username;
+        console.log(url);
         var request = https.request(url, options, function(response) {
           res.on('data', d => {
             process.stdout.write(d);
@@ -129,9 +115,9 @@ app.post("/delete-profile", function(req, res) {
     });
   })
 
-  var apiUrl = "https://cornellmeetup.azurewebsites.net/api/userinfo?type=delete&username=" + globalUsername;
+  var apiUrl = "https://cornellmeetup.azurewebsites.net/api/userinfo?type=delete&username=" + req.body.username;
   var request = https.get(apiUrl, function(response) {})
-  var apiUrl = "https://cornellmeetup.azurewebsites.net/api/locationinfo?type=delete&username=" + globalUsername;
+  var apiUrl = "https://cornellmeetup.azurewebsites.net/api/locationinfo?type=delete&username=" + req.body.username;
   var request = https.get(apiUrl, function(response) {})
 
   res.redirect("/");
@@ -167,11 +153,11 @@ app.post("/check-username", function(req, res) {
 })
 
 app.post("/update-profile", function(req, res) {
-  var apiUrl = "https://cornellmeetup.azurewebsites.net/api/userinfo?type=get&username=" + globalUsername;
+  var apiUrl = "https://cornellmeetup.azurewebsites.net/api/userinfo?type=get&username=" + req.body.username;
   var request = https.get(apiUrl, function(response) {
     response.on("data", function(data) {
       const output = JSON.parse(data);
-      var apiUrl = "https://cornellmeetup.azurewebsites.net/api/userinfo?type=update&username=" + globalUsername;
+      var apiUrl = "https://cornellmeetup.azurewebsites.net/api/userinfo?type=update&username=" + req.body.username;
       birthday = req.body.birthday;
       timezone = req.body.timezone;
       pfp = req.body.pfp;
@@ -207,7 +193,7 @@ app.post("/update-profile", function(req, res) {
       if (groupList[0] != "") {
         //removing user from all groups
         for (var i = 0; i < output.groups.length; i++) {
-          var url = "https://cornellmeetup.azurewebsites.net/api/groupinfo?type=removemember&groupname=" + output.groups[i] + "&username=" + globalUsername;
+          var url = "https://cornellmeetup.azurewebsites.net/api/groupinfo?type=removemember&groupname=" + output.groups[i] + "&username=" + req.body.username;
           console.log(url);
           var request = https.request(url, options, function(response) {
             res.on('data', d => {
@@ -222,7 +208,7 @@ app.post("/update-profile", function(req, res) {
         }
         //adding user to all new groups
         for (var i = 0; i < groupList.length; i++) {
-          var url = "https://cornellmeetup.azurewebsites.net/api/groupinfo?type=addmember&groupname=" + groupList[i] + "&username=" + globalUsername;
+          var url = "https://cornellmeetup.azurewebsites.net/api/groupinfo?type=addmember&groupname=" + groupList[i] + "&username=" + req.body.username;
           console.log(url);
           var request = https.request(url, options, function(response) {
             res.on('data', d => {
@@ -261,7 +247,7 @@ app.post("/update-profile", function(req, res) {
       });
       request.write(postData);
       request.end();
-      res.redirect("/profile");
+      res.redirect(307, "/profile");
     });
 
 
@@ -276,6 +262,7 @@ app.post("/log-in-buffer", function(req, res) {
   var username = req.body.username;
   var password = req.body.password;
   var apiUrl = "https://cornellmeetup.azurewebsites.net/api/userinfo?type=get&username=" + username;
+  console.log(apiUrl);
   var request = https.get(apiUrl, function(response) {
     var output;
     if (response.statusCode == 200) {
@@ -286,32 +273,35 @@ app.post("/log-in-buffer", function(req, res) {
   });
 })
 
-app.post("/map", function(req, res) {
+app.post("login-in-buffer-part-two", function(req,res) {
   var username = req.body.username;
-  globalUsername = username;
   var password = req.body.password;
-
-  var apiUrl = "https://cornellmeetup.azurewebsites.net/api/authservice?type=authenticate&username=" + globalUsername + "&password=" + password;
+  var apiUrl = "https://cornellmeetup.azurewebsites.net/api/authservice?type=authenticate&username=" + username + "&password=" + password;
   var request = https.get(apiUrl, function(response) {
-    var output;
     response.on("data", function(data) {
       const output = JSON.parse(data);
       if (output == true) {
-        res.render(__dirname + "/map.html", {
-          username: globalUsername
-        });
+        res.redirect(307, "/map");
       } else {
         res.redirect("/failed-login");
       }
     });
+})
+})
 
+app.post("/map", function(req, res) {
+  var username = req.body.username;
 
-  })
+  res.render(__dirname + "/map.html", {
+    username: req.body.username
+  });
 })
 
 app.get("/map", function(req, res) {
+  console.log(req.body.username);
+  console.log("MADE IT");
   res.render(__dirname + "/map.html", {
-    username: globalUsername
+    username: req.body.username
   });
 })
 
