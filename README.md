@@ -1,14 +1,16 @@
 # CornellMeetUp
 Project for CS 5412. Social Media for Cornell students.<br>
 https://cornell-meetup.azurewebsites.net/
-
+<br>
+# Original Plan For Project:
 ![Picture of planned app look](https://github.com/MitchellGray100/CornellSocial/blob/main/readme/CornellSocialPlannedApp.png?raw=true)
 
 CS 5412: Course Project Final Report
-Authors: 
-Mitchell Gray (meg346)
-Jacob Kerr (jck268)
-
+Authors: <br>
+Mitchell Gray (meg346)<br>
+Jacob Kerr (jck268)<br>
+___
+___
 # Introduction <br>
 Our application solves our problem by giving our users a platform for easily meeting up with other users, being able to better plan their days, and easily seeing where events are compared to where they are. This is important to us because people are extremely busy and being able to manage group chats, hangouts, times of events, and locations of friends/events can be very difficult when spare time is very limited. We want to do this because we would like to provide a convenient and useful solution for everyday people to solve this management problem. Somewhat similar products would be YikYak and Life360. Life 360 allows users to track their family members or friends. Premium users can also message other users. YikYak uses location to make a social media platform that allows users to interact with other users that are nearby. Ours is definitely very different and provides a unique experience.
 
