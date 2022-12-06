@@ -41,6 +41,7 @@
     var currentChatGroup;
     var chatLoadedOnce = false;
     var blockChat = false;
+    var doActions = false;
     console.log(username);
 
     var map, marker, radius = 20;
@@ -88,14 +89,12 @@
              const groupElement = document.createElement("button");
              groupElement.setAttribute("name", i);
              groupElement.onclick = function(){
-              if(!blockChat)
-              {
               blockChat = true;
               removeAllChildNodes(chatDiv);
               currentChatNum = 0;
               currentChatGroup = groups[groupElement.getAttribute("name")];
               reloadChat();
-            }
+
              };
              groupElement.innerHTML = data.groups[i];
              groupDiv.append(groupElement);
@@ -104,6 +103,10 @@
           }
           chatLoadedOnce = true;
 
+        }).then(finalOutput => {
+          addUsers();
+          reloadChat();
+          blockChat = false;
         }).catch(err => {
           console.log(err);
         });
@@ -124,7 +127,6 @@
     }
 
     function addUsers() {
-
       starting = true;
       ready = true;
       flag = false;
@@ -146,6 +148,8 @@
               map.markers.add(newMarker);
             }
           }
+        }).then(finalOutput => {
+          changePhotos();
         }).catch(err => {
           console.log(err);
         });
@@ -178,20 +182,6 @@
     }
 
     function positionOnMap(timer) {
-      var doActions = false;
-      if (starting) {
-        console.log("Starting Application");
-        doActions = true;
-      }
-      if(getRandomInt(60) == 1 && ready == true)
-      {
-        starting = false;
-        ready = false;
-        doActions = true;
-        console.log("Ready");
-
-      }
-
       if(getRandomInt(100) == 1)
       {
         starting = false;
@@ -199,9 +189,6 @@
         doActions = true;
         console.log("Updating");
         startChat = false;
-
-      if (groups.length != 0 && flag == true) {
-        addUsers();
       }
 
       if (doActions) {
@@ -209,11 +196,8 @@
 
       }
       if (doActions && !blockChat){
-        console.log("MADE IT");
         blockChat = true;
-        console.log(blockChat);
         apiUrl = 'https://cornellmeetup.azurewebsites.net/api/chatinfo?type=getafter&groupname='+currentChatGroup+'&chatid='+currentChatNum;
-        console.log(apiUrl);
         fetch(apiUrl)
            .then(response => response.json())
            .then(texts =>
@@ -238,7 +222,7 @@
          blockChat = false;
         }
      }
-      }
+
 
       let output;
       const successCallback = (position) => {
@@ -278,14 +262,17 @@
               console.log(err);
             });
           });
+          doActions = false;
         }
       };
 
       const errorCallback = (error) => {
+        console.log("ERROR");
         console.log(error);
       };
 
       if (doActions) {
+
         navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
         apiUrl = 'https://cornellmeetup.azurewebsites.net/api/userinfo?type=get&username=' + username;
         outputter = fetch(apiUrl, {
@@ -340,7 +327,6 @@
       }
 
       apiUrl = 'https://cornellmeetup.azurewebsites.net/api/chatinfo?type=getall&groupname='+currentChatGroup;
-      console.log(apiUrl);
       console.log("currentChatNum = " + currentChatNum);
       fetch(apiUrl)
          .then(response => response.json())

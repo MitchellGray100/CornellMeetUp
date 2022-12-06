@@ -92,14 +92,11 @@ app.post("/create-group", function(req, res) {
 
 app.post("/delete-profile", function(req, res) {
   var apiUrl = "https://cornellmeetup.azurewebsites.net/api/userinfo?type=get&username=" + req.body.username;
-  console.log(apiUrl);
   var request = https.get(apiUrl, function(response) {
     response.on("data", function(data) {
       const output = JSON.parse(data);
-      console.log(output);
       for (var i = 0; i < output.groups.length; i++) {
         var url = "https://cornellmeetup.azurewebsites.net/api/groupinfo?type=removemember&groupname=" + output.groups[i] + "&username=" + req.body.username;
-        console.log(url);
         var request = https.request(url, options, function(response) {
           res.on('data', d => {
             process.stdout.write(d);
@@ -194,7 +191,6 @@ app.post("/update-profile", function(req, res) {
         //removing user from all groups
         for (var i = 0; i < output.groups.length; i++) {
           var url = "https://cornellmeetup.azurewebsites.net/api/groupinfo?type=removemember&groupname=" + output.groups[i] + "&username=" + req.body.username;
-          console.log(url);
           var request = https.request(url, options, function(response) {
             res.on('data', d => {
               process.stdout.write(d);
@@ -209,7 +205,6 @@ app.post("/update-profile", function(req, res) {
         //adding user to all new groups
         for (var i = 0; i < groupList.length; i++) {
           var url = "https://cornellmeetup.azurewebsites.net/api/groupinfo?type=addmember&groupname=" + groupList[i] + "&username=" + req.body.username;
-          console.log(url);
           var request = https.request(url, options, function(response) {
             res.on('data', d => {
               process.stdout.write(d);
@@ -262,7 +257,6 @@ app.post("/log-in-buffer", function(req, res) {
   var username = req.body.username;
   var password = req.body.password;
   var apiUrl = "https://cornellmeetup.azurewebsites.net/api/userinfo?type=get&username=" + username;
-  console.log(apiUrl);
   var request = https.get(apiUrl, function(response) {
     var output;
     if (response.statusCode == 200) {
@@ -299,7 +293,6 @@ app.post("/map", function(req, res) {
 
 app.get("/map", function(req, res) {
   console.log(req.body.username);
-  console.log("MADE IT");
   res.render(__dirname + "/map.html", {
     username: req.body.username
   });
