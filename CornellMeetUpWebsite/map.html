@@ -5,7 +5,7 @@
   <title>Cornell MeetUp</title>
 
   <meta charset="utf-8" />
-  <link rel="icon" type="image/x-icon" href="images/MeetUp Favicon.svg">
+  <link rel="icon" type="image/x-icon" href="images/MeetUp Favicon.ico">
 
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
   <meta name="description" content="This sample shows how to animate the position of a HTML marker on the map by updating the coordinates." />
@@ -40,6 +40,7 @@
     var currentChatNum = 0;
     var currentChatGroup;
     var chatLoadedOnce = false;
+    var blockChat = false;
     console.log(username);
 
     var map, marker, radius = 20;
@@ -87,10 +88,14 @@
              const groupElement = document.createElement("button");
              groupElement.setAttribute("name", i);
              groupElement.onclick = function(){
+              if(!blockChat)
+              {
+              blockChat = true;
               removeAllChildNodes(chatDiv);
               currentChatNum = 0;
               currentChatGroup = groups[groupElement.getAttribute("name")];
               reloadChat();
+            }
              };
              groupElement.innerHTML = data.groups[i];
              groupDiv.append(groupElement);
@@ -203,8 +208,12 @@
         changePhotos();
 
       }
-      if (doActions){
+      if (doActions && !blockChat){
+        console.log("MADE IT");
+        blockChat = true;
+        console.log(blockChat);
         apiUrl = 'https://cornellmeetup.azurewebsites.net/api/chatinfo?type=getafter&groupname='+currentChatGroup+'&chatid='+currentChatNum;
+        console.log(apiUrl);
         fetch(apiUrl)
            .then(response => response.json())
            .then(texts =>
@@ -226,6 +235,7 @@
            textDiv.append(spacing);
          });
          currentChatNum += counter;
+         blockChat = false;
         }
      }
       }
@@ -327,9 +337,11 @@
           map.markers.remove(item);
         });
         addUsers();
-    }
+      }
 
       apiUrl = 'https://cornellmeetup.azurewebsites.net/api/chatinfo?type=getall&groupname='+currentChatGroup;
+      console.log(apiUrl);
+      console.log("currentChatNum = " + currentChatNum);
       fetch(apiUrl)
          .then(response => response.json())
          .then(texts => showText(texts.chats));
@@ -347,6 +359,7 @@
          textDiv.append(spacing);
        });
        currentChatNum += counter;
+       blockChat = false;
       }
     }
 
