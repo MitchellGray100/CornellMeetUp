@@ -33,6 +33,7 @@
           <div class="login-wrap p-0">
             <h3 class="mb-4 text-center">Update Profile Info</h3>
             <form action="/update-profile" class="signin-form" method="post">
+            <input type="hidden" name="username" value="<%= username %>">
               <!-- <div class="form-group">
                 <input id="password-field" name="password" type="password" class="form-control" placeholder="Password">
                 <span toggle="#password-field" class="fa fa-fw fa-eye field-icon toggle-password"></span>
@@ -53,7 +54,8 @@
                 <button id="Sign-In-Button" type="submit" class="form-control btn btn-primary submit px-3">Update Information</button>
               </div>
             </form>
-            <form class="" action="/map" method="get">
+            <form class="" action="/map" method="post">
+            <input type="hidden" name="username" value="<%= username %>">
               <button style="background-color: white!important;" type="submit" class="form-control btn btn-primary login">Go Back To Map</button>
             </form>
           </div>

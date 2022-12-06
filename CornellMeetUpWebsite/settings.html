@@ -33,11 +33,13 @@
           <div class="login-wrap p-0">
             <h3 style="margin-bottom: 10%;" class="mb-4 text-center">Settings</h3>
             <form action="/delete-profile" class="signin-form" method="post">
+            <input type="hidden" name="username" value="<%= username %>">
               <div class="form-group">
                 <button style="margin-bottom: 10%;" id="Sign-In-Button" type="submit" class="form-control btn btn-primary submit px-3">Delete Account</button>
               </div>
             </form>
-            <form class="" action="/map" method="get">
+            <form class="" action="/map" method="post">
+            <input type="hidden" name="username" value="<%= username %>">
               <button style="background-color: white!important;" type="submit" class="form-control btn btn-primary login">Go Back To Map</button>
             </form>
           </div>
