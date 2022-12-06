@@ -266,14 +266,14 @@ app.post("/log-in-buffer", function(req, res) {
   var request = https.get(apiUrl, function(response) {
     var output;
     if (response.statusCode == 200) {
-      res.redirect(307, "/map");
+      res.redirect(307, "/login-in-buffer-part-two");
     } else {
       res.redirect("/failed-login");
     }
   });
 })
 
-app.post("login-in-buffer-part-two", function(req,res) {
+app.post("/login-in-buffer-part-two", function(req,res) {
   var username = req.body.username;
   var password = req.body.password;
   var apiUrl = "https://cornellmeetup.azurewebsites.net/api/authservice?type=authenticate&username=" + username + "&password=" + password;
