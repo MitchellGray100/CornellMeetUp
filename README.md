@@ -56,7 +56,9 @@ The map is bound to the Cornell campus. The following pictures show how far a us
 ![Picture of Map Bounds](https://raw.githubusercontent.com/MitchellGray100/CornellMeetUp/main/README-Images/Bounds.PNG)
 
 At the top of the application there are many options. Below are the corresponding pages to those options (zoomed in to save space in the report).<br>
-![Picture of Options](https://raw.githubusercontent.com/MitchellGray100/CornellMeetUp/main/README-Images/Options.PNG)
+<p align="center">
+ <img src="https://raw.githubusercontent.com/MitchellGray100/CornellMeetUp/main/README-Images/Options.PNG"></img>
+</p>
 
 # Architecture/Specification <br>
 Users currently use the application through their desktop. We plan on using Electron to port our project to ios, or android. This will be relatively easy since the backend runs on Node.JS and already scales to mobile sizes using Bootstrap. Desktop users can access the application through our website running as a first tier microservice on Azure. Data flow goes from the user end to the microservices to the database and then goes back to the user in reverse order whenever users request information.  Whenever data is sent to the database, the data goes from the user end to the microservices and then to the database and ends there. Microservices work together in multiple ways. The microservices will access the same database for the backend. Our tier one microservice, the frontend, will interact with the other microservices for getting information to display and allowing users to login. Our user microservice creates user-Obfuscation files for authentication by using the authentication microservice.
@@ -81,6 +83,10 @@ At the top of the application architecture is the first-tier microservice layer,
 - Azure Maps = No data, assume no bottle neck as it is Azure REST API service
 - Azure Event Hub with Apache Kafka (Message queue for chat) = 1,000 requests per second per instance * 1 instance = 1,000 requests per second
 - Summary: current bottleneck is the chat message queue (Azure Event Hub) with 1,000 chat messages per second but this can be easily scaled by adding more instances
+
+<p align="center">
+ <img src="https://github.com/MitchellGray100/CornellSocial/blob/main/README-Images/Performance.PNG"></img>
+</p>
 
 # Evaluation <br>
 The deliverable is in the form of a Node.JS application which will soon be platform agnostic. Users are able to access the service on a website in the form of a web application. We will demo the front end application by demonstrating how a user might interact with the service. We will show off creating a new user, joining and creating groups, deleting accounts, displaying all group members’ locations, and sending chat messages to groups. Our implementation can be evaluated by the usefulness of the application to an average end user. Since our current market is towards Cornell students, the product should be evaluated based on the utility it grants students on campus. For example, if the app is able to provide a good enough experience that it helps a certain group of students plan meeting up on campus more easily, the implementation can be considered a success.  We will evaluate our project as successful if users on all platforms can have an account, join groups, send messages, see other users in their groups & events.
