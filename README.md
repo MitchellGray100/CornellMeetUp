@@ -6,6 +6,13 @@ CS 5412: Course Project Final Report<br>
 ## <b>Authors: <br>
 ### [Mitchell Gray (meg346)](https://github.com/MitchellGray100)<br>
 ### [Jacob Kerr (jck268)](https://github.com/jakejack13)</b><br>
+
+# Grade and Comments
+95/100<br>
+"This was a meetup app. It used Azure effectively and was carefully tested, but a bunch of functionality they initially planned was halfway finished -- mostly due to GUI limitations, but you get the sense that deploying quite so much Azure "stuff" was harder than they expected. But they did a highly professional job, what they did build worked and was evaluated carefully, showed a LOT of cloud computing understanding." 
+<br>-Course Staff
+
+
 ___
 ___
 
