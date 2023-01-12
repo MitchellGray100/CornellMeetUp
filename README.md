@@ -1,6 +1,7 @@
 # CornellMeetUp
 Project for CS 5412. Social Media for Cornell students.<br>
-https://cornell-meetup.azurewebsites.net/
+https://cornell-meetup.azurewebsites.net/<br>
+(Azure credits remove so no longer running)
 <br>
 CS 5412: Course Project Final Report<br>
 ## <b>Authors: <br>
