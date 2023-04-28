@@ -1,6 +1,6 @@
 # CornellMeetUp
 Project for CS 5412. Social Media for Cornell students.<br>
-1 of 32 projects selected for [BOOM 2023](https://cis.cornell.edu/about/outreach-events/boom-bits-our-minds/projects/boom-2023-projects)<br>
+1 of 32 projects selected to present at [BOOM 2023](https://cis.cornell.edu/about/outreach-events/boom-bits-our-minds/projects/boom-2023-projects)<br>
 https://cornell-meetup.azurewebsites.net/<br>
 (Azure credits remove so no longer running)
 <br>
