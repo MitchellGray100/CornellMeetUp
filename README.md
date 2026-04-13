@@ -21,6 +21,9 @@ ___
 # Google Slides for Demo:<br>
 https://docs.google.com/presentation/d/1NvpO7OM1eySlyvmGFYd5nsCzMnCoXvrrvCDMqepIukI/edit?usp=sharing
 
+![Picture of BOOM Poster](https://github.com/MitchellGray100/CornellMeetUp/blob/main/README-Images/BOOM%20Poster.png?raw=true)
+
+
 # Original Plan For Project:
 ![Picture of planned app look](https://github.com/MitchellGray100/CornellSocial/blob/main/readme/CornellSocialPlannedApp.png?raw=true)
 
